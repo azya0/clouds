@@ -5,9 +5,9 @@ uniform sampler3D perlin_noise;
 uniform sampler3D large_cloud_noise;
 uniform sampler3D medium_cloud_noise;
 uniform sampler3D small_cloud_noise;
-// 512_reymarch_steps
+
 uniform int steps = 128;
-uniform int ray_march_steps = 8;
+uniform int sun_steps = 8;
 
 uniform vec3 box_center;
 uniform vec3 box_size;
@@ -17,7 +17,8 @@ uniform float form_multiplier = 0.065;
 uniform float density_multiplier = 0.25;
 
 uniform vec3 light_direction  = vec3(1.0, -1.0, 1.0);
-uniform vec3 density_constant = vec3(1.0);
+uniform float density_constant = 1.0;
+uniform float sun_constant     = 1.0;
 
 
 mat3 get_rotation_matrix(vec3 angles) {
@@ -169,32 +170,60 @@ vec3 base_color_vector() {
 	);
 }
 
-vec4 raymarching(vec3 start_point, vec3 end_point, int interations) {
-	// implementation of T(A, B) function
+float cast_ray_to_sun(vec3 start_position, int iterations) {
+	GetIntersectionsProps prop;
+	prop.ray_origin = start_position;
+	prop.ray_direction -normalize(light_direction);
 
-	float total_distance = distance(start_point, end_point);
-	float step_size = length(box_size) / float(interations);
-	int total_steps = int(total_distance / length(box_size) * float(interations));
+	IntersectionResult intersection = get_intersections(prop);
+	vec3 end_position = intersection.array[0];
 
-	vec3 direction = normalize(end_point - start_point);
-	vec3 current_pos = start_point;
+	float total_distance = distance(start_position, end_position);
+	float step_size = length(box_size) / float(iterations);
+	int total_steps = int(total_distance / length(box_size) * float(iterations));
+
+	vec3 direction = normalize(end_position - start_position);
+	vec3 current_pos = start_position;
 
 	float full_density = 0.0;
 
 	for (int index = 0; index < total_steps; index++) {
+		full_density += get_density(current_pos / box_size + 0.5);
+
+		current_pos += direction;
+	}
+
+	return full_density * step_size;
+}
+
+vec4 raymarching(vec3 start_point, vec3 end_point, int iterations) {
+	float total_distance = distance(start_point, end_point);
+	float step_size = length(box_size) / float(iterations);
+	int total_steps = int(total_distance / length(box_size) * float(iterations));
+
+	vec3 direction = normalize(end_point - start_point);
+	vec3 current_pos = start_point;
+
+	vec3 color = vec3(0.0);
+	float transmittance = 1.0;
+
+	for (int index = 0; index < total_steps; index++) {
 		vec3 local_position = current_pos - box_center;
 
-		full_density += get_density(local_position / box_size + 0.5);
+		float density     = get_density(local_position / box_size + 0.5) * step_size;
+		float sun_density = cast_ray_to_sun(local_position, sun_steps);
 
 		current_pos += direction * step_size;
+
+		float sun_impact = exp(-sun_constant * sun_density);
+		float density_impact = density_constant * density;
+		float light = sun_impact * density_impact;
+
+		color += light * transmittance;
+		transmittance *= exp(-sun_constant * density);
 	}
 
-	vec3 color = exp(-density_constant * full_density * step_size);
-	vec4 result = vec4(color, 1.0);
-
-	if (full_density <= 0.01) {
-		result.a = 0.0;
-	}
+	vec4 result = vec4(color, 1.0 - transmittance);
 
 	return result;
 }
@@ -218,6 +247,7 @@ void fragment() {
     intersection_props.ray_origin = local_ray_origin;
     intersection_props.ray_direction = local_ray_direction;
 
+	// #TODO: remove translation from local coords to global
     IntersectionResult intersection = process_intersections(
 		get_intersections(intersection_props),
 		rotation_matrix,

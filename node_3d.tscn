@@ -18,14 +18,15 @@ shader_parameter/large_cloud_noise = ExtResource("2_a0tk4")
 shader_parameter/medium_cloud_noise = ExtResource("3_jka67")
 shader_parameter/small_cloud_noise = ExtResource("4_i5arm")
 shader_parameter/steps = 512
-shader_parameter/ray_march_steps = 16
+shader_parameter/sun_steps = 16
 shader_parameter/box_center = Vector3(0, 100, 0)
 shader_parameter/box_size = Vector3(500, 250, 500)
 shader_parameter/box_angle = Vector3(0, 0, 0)
 shader_parameter/form_multiplier = 0.07
 shader_parameter/density_multiplier = 0.5
 shader_parameter/light_direction = Vector3(0, -1, 0)
-shader_parameter/density_constant = Vector3(1, 1, 1)
+shader_parameter/density_constant = 0.245
+shader_parameter/sun_constant = 0.15
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jka67"]
 render_priority = 0
@@ -35,14 +36,15 @@ shader_parameter/large_cloud_noise = ExtResource("2_a0tk4")
 shader_parameter/medium_cloud_noise = ExtResource("3_jka67")
 shader_parameter/small_cloud_noise = ExtResource("4_i5arm")
 shader_parameter/steps = 128
-shader_parameter/ray_march_steps = 8
+shader_parameter/sun_steps = 8
 shader_parameter/box_center = Vector3(0, 107, 0)
 shader_parameter/box_size = Vector3(100, 50, 100)
 shader_parameter/box_angle = Vector3(0, 0, 0)
 shader_parameter/form_multiplier = 0.065
 shader_parameter/density_multiplier = 0.25
 shader_parameter/light_direction = Vector3(0, 0, 0)
-shader_parameter/density_constant = Vector3(1, 1, 1)
+shader_parameter/density_constant = 1.0
+shader_parameter/sun_constant = 1.0
 
 [node name="Node3D" type="Node3D"]
 
