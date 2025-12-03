@@ -151,13 +151,13 @@ float high_frequency_noise(vec3 position) {
 float get_density(vec3 position) {
 	float high_octave = high_frequency_noise(position);
 	float low_octave = low_frequency_noise(high_octave, position);
-	
+
 	float result = (high_octave * 0.15 + low_octave * 0.85) * form_multiplier;
-	
+
 	if (result < 0.05) {
 		return 0.0;
 	}
-	
+
 	return result;
 }
 
@@ -169,14 +169,9 @@ vec3 base_color_vector() {
 	);
 }
 
-struct RayMarchingResult {
-	vec3 color;
-	bool is_empty;	
-};
-
-RayMarchingResult raymarching(vec3 start_point, vec3 end_point, int interations) {
+vec4 raymarching(vec3 start_point, vec3 end_point, int interations) {
 	// implementation of T(A, B) function
-	
+
 	float total_distance = distance(start_point, end_point);
 	float step_size = length(box_size) / float(interations);
 	int total_steps = int(total_distance / length(box_size) * float(interations));
@@ -193,10 +188,13 @@ RayMarchingResult raymarching(vec3 start_point, vec3 end_point, int interations)
 
 		current_pos += direction * step_size;
 	}
-	
-	RayMarchingResult result;
-	result.color = exp(-density_constant * full_density * step_size);
-	result.is_empty = full_density <= 0.01;
+
+	vec3 color = exp(-density_constant * full_density * step_size);
+	vec4 result = vec4(color, 1.0);
+
+	if (full_density <= 0.01) {
+		result.a = 0.0;
+	}
 
 	return result;
 }
@@ -236,15 +234,12 @@ void fragment() {
 		discard;
 	}
 
-	RayMarchingResult result = raymarching(
+	vec4 result = raymarching(
 		intersection.array[0],
 		intersection.array[1],
 		steps
 	);
 
-	ALBEDO = result.color;
-	
-	if (result.is_empty) {
-		ALPHA = 0.0;
-	}
+	ALBEDO = result.rgb;
+	ALPHA = result.a;
 }
