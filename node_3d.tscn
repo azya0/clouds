@@ -1,10 +1,10 @@
 [gd_scene load_steps=9 format=3 uid="uid://b1584h54rsh1h"]
 
 [ext_resource type="Shader" uid="uid://clskak4vfucsp" path="res://Shaders/BoxShader.gdshader" id="1_a202f"]
-[ext_resource type="NoiseTexture3D" uid="uid://6ed3lvlpbqmg" path="res://NoiseTextures/LargeScaleNoise.tres" id="2_a0tk4"]
-[ext_resource type="NoiseTexture3D" uid="uid://dxyewgt7o40m0" path="res://NoiseTextures/MediumScaleNoise.tres" id="3_jka67"]
-[ext_resource type="NoiseTexture3D" uid="uid://bnck2kxeg5bkg" path="res://NoiseTextures/SmallScaleNoise.tres" id="4_i5arm"]
+[ext_resource type="NoiseTexture3D" uid="uid://6ed3lvlpbqmg" path="res://NoiseTextures/LargeScaleNoise.tres" id="2_jka67"]
+[ext_resource type="NoiseTexture3D" uid="uid://dxyewgt7o40m0" path="res://NoiseTextures/MediumScaleNoise.tres" id="3_i5arm"]
 [ext_resource type="NoiseTexture3D" uid="uid://dv4e7882w16d4" path="res://NoiseTextures/PerlinNoise.tres" id="4_wc5p8"]
+[ext_resource type="NoiseTexture3D" uid="uid://bnck2kxeg5bkg" path="res://NoiseTextures/SmallScaleNoise.tres" id="5_jsk3o"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i5arm"]
 transparency = 1
@@ -14,35 +14,31 @@ albedo_color = Color(1, 1, 1, 0)
 render_priority = 0
 shader = ExtResource("1_a202f")
 shader_parameter/perlin_noise = ExtResource("4_wc5p8")
-shader_parameter/large_cloud_noise = ExtResource("2_a0tk4")
-shader_parameter/medium_cloud_noise = ExtResource("3_jka67")
-shader_parameter/small_cloud_noise = ExtResource("4_i5arm")
+shader_parameter/large_cloud_noise = ExtResource("2_jka67")
+shader_parameter/medium_cloud_noise = ExtResource("3_i5arm")
+shader_parameter/small_cloud_noise = ExtResource("5_jsk3o")
 shader_parameter/steps = 512
-shader_parameter/sun_steps = 16
-shader_parameter/box_center = Vector3(0, 100, 0)
+shader_parameter/sun_steps = 0
+shader_parameter/box_center = Vector3(0, 0, 0)
 shader_parameter/box_size = Vector3(500, 250, 500)
 shader_parameter/box_angle = Vector3(0, 0, 0)
-shader_parameter/form_multiplier = 0.07
-shader_parameter/density_multiplier = 0.5
+shader_parameter/form_multiplier = 0.069
+shader_parameter/density_multiplier = 0.25
 shader_parameter/light_direction = Vector3(0, -1, 0)
-shader_parameter/density_constant = 0.245
-shader_parameter/sun_constant = 0.15
+shader_parameter/density_constant = 0.48
+shader_parameter/sun_constant = 0.47
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jka67"]
 render_priority = 0
 shader = ExtResource("1_a202f")
-shader_parameter/perlin_noise = ExtResource("4_wc5p8")
-shader_parameter/large_cloud_noise = ExtResource("2_a0tk4")
-shader_parameter/medium_cloud_noise = ExtResource("3_jka67")
-shader_parameter/small_cloud_noise = ExtResource("4_i5arm")
 shader_parameter/steps = 128
 shader_parameter/sun_steps = 8
-shader_parameter/box_center = Vector3(0, 107, 0)
-shader_parameter/box_size = Vector3(100, 50, 100)
+shader_parameter/box_center = Vector3(0, 0, 0)
+shader_parameter/box_size = Vector3(0, 0, 0)
 shader_parameter/box_angle = Vector3(0, 0, 0)
 shader_parameter/form_multiplier = 0.065
 shader_parameter/density_multiplier = 0.25
-shader_parameter/light_direction = Vector3(0, 0, 0)
+shader_parameter/light_direction = Vector3(1, -1, 1)
 shader_parameter/density_constant = 1.0
 shader_parameter/sun_constant = 1.0
 
@@ -52,7 +48,6 @@ shader_parameter/sun_constant = 1.0
 transform = Transform3D(0.999159, 0, -0.041003738, 0.014024103, 0.9396926, 0.34173247, 0.03853091, -0.34202012, 0.9389023, 1, 31.4, 53.9)
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 100, 0)
 material_override = SubResource("StandardMaterial3D_i5arm")
 material_overlay = SubResource("ShaderMaterial_wc5p8")
 size = Vector3(500, 250, 500)

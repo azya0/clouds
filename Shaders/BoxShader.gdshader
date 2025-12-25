@@ -20,6 +20,8 @@ uniform vec3 light_direction  = vec3(1.0, -1.0, 1.0);
 uniform float density_constant = 1.0;
 uniform float sun_constant     = 1.0;
 
+varying vec3 box_min;
+varying vec3 box_max;
 
 mat3 get_rotation_matrix(vec3 angles) {
     float cx = cos(angles.x);
@@ -36,18 +38,6 @@ mat3 get_rotation_matrix(vec3 angles) {
     );
 }
 
-vec3 get_intersection(int index, bool is_positive, vec3 origin, vec3 direction) {
-    float coefficient = 1.0;
-
-    if (!is_positive) {
-        coefficient *= -1.0;
-    }
-
-    float t = (coefficient * box_size[index] / 2.0 - origin[index]) / direction[index];
-
-    return direction * t + origin;
-}
-
 struct GetIntersectionsProps {
     vec3 ray_origin;
     vec3 ray_direction;
@@ -55,71 +45,38 @@ struct GetIntersectionsProps {
 
 struct IntersectionResult {
     vec3[2] array;
-    int state;
+	bool is_valid;
 };
 
-vec3[2] swap(vec3[2] array) {
-	array[0] += array[1];
-	array[1] = array[0] - array[1];
-	array[0] -= array[1];
-
-	return array;
-}
-
 IntersectionResult get_intersections(GetIntersectionsProps props) {
-    IntersectionResult result;
-    result.state = 0;
-	bool is_full = false;
+	const float EPSILON = 1e-6;
+	vec3 dodge_inf = EPSILON * sign(props.ray_direction);
+	
+	vec3 inv_dir = 1.0 / (props.ray_direction + dodge_inf);
 
-    for (int index = 0; index < 3; index++) {
-        bool is_positive = false;
+	vec3 tbot = inv_dir * (box_min - props.ray_origin);
+    vec3 ttop = inv_dir * (box_max - props.ray_origin);
 
-        for (int _index = 0; _index < 2; _index++) {
-            is_positive = !is_positive;
+    vec3 tminXYZ = min(ttop, tbot);
+    vec3 tmaxXYZ = max(ttop, tbot);
 
-            vec3 point = get_intersection(index, is_positive, props.ray_origin, props.ray_direction);
+	IntersectionResult result;
 
-            bool is_accepted = true;
+	float t_min = max(tminXYZ.x, max(tminXYZ.y, tminXYZ.z));
+	float t_max = min(tmaxXYZ.x, min(tmaxXYZ.y, tmaxXYZ.z));
 
-            for (int another_index = 0; another_index < 3; another_index++) {
-                if (another_index == index) {
-                    continue;
-                }
+    result.array[0] = props.ray_origin + props.ray_direction * t_min;
+    result.array[1] = props.ray_origin + props.ray_direction * t_max;
 
-                if (abs(point[another_index]) > box_size[another_index] / 2.0) {
-                    is_accepted = false;
-                    break;
-                }
-            }
+	result.is_valid = t_max > max(t_min, 0.0);
 
-            if (!is_accepted) {
-                continue;
-            }
-
-            result.array[result.state++] = point;
-
-            if (result.state == 2) {
-                is_full = true;
-				break;
-            }
-        }
-
-		if (is_full) {
-			break;
-		}
-    }
-
-    return result;
+	return result;
 }
 
 IntersectionResult process_intersections(IntersectionResult intersection, mat3 rot, vec3 world_ray_origin) {
 	for (int index = 0; index < 2; index++) {
         intersection.array[index] = rot * intersection.array[index] + box_center;
     }
-
-	if (distance(world_ray_origin, intersection.array[0]) > distance(world_ray_origin, intersection.array[1])) {
-		intersection.array = swap(intersection.array);
-	}
 
 	return intersection;
 }
@@ -162,38 +119,45 @@ float get_density(vec3 position) {
 	return result;
 }
 
-vec3 base_color_vector() {
-	return vec3(
-		5.8e-6,
-		13.5e-6,
-		33.1e-6
-	);
-}
+// start_position in local coords
+float cast_ray_to_sun(vec3 start_position) {
+	if (sun_steps == 0) {
+		return 1.0;
+	}
 
-float cast_ray_to_sun(vec3 start_position, int iterations) {
 	GetIntersectionsProps prop;
 	prop.ray_origin = start_position;
-	prop.ray_direction -normalize(light_direction);
+
+	// #TODO add rotation logic
+	vec3 direction = -normalize(light_direction);
+	prop.ray_direction = direction;
 
 	IntersectionResult intersection = get_intersections(prop);
-	vec3 end_position = intersection.array[0];
+	vec3 end_position;
+
+	vec3 way = normalize(intersection.array[1] - start_position);
+
+	if (dot(direction, way) > 0.0) {
+		end_position = intersection.array[0];
+	} else {
+		end_position = intersection.array[1];
+	}
 
 	float total_distance = distance(start_position, end_position);
-	float step_size = length(box_size) / float(iterations);
-	int total_steps = int(total_distance / length(box_size) * float(iterations));
+	float step_size = length(box_size) / float(sun_steps);
+	int total_steps = int(total_distance / length(box_size) * float(sun_steps));
 
-	vec3 direction = normalize(end_position - start_position);
 	vec3 current_pos = start_position;
 
 	float full_density = 0.0;
 
 	for (int index = 0; index < total_steps; index++) {
-		full_density += get_density(current_pos / box_size + 0.5);
+		full_density += get_density(current_pos / box_size + 0.5) * step_size;
 
 		current_pos += direction;
 	}
 
-	return full_density * step_size;
+	return full_density;
 }
 
 vec4 raymarching(vec3 start_point, vec3 end_point, int iterations) {
@@ -202,18 +166,17 @@ vec4 raymarching(vec3 start_point, vec3 end_point, int iterations) {
 	int total_steps = int(total_distance / length(box_size) * float(iterations));
 
 	vec3 direction = normalize(end_point - start_point);
-	vec3 current_pos = start_point;
+	vec3 local_position = start_point - box_center;
 
 	vec3 color = vec3(0.0);
 	float transmittance = 1.0;
 
 	for (int index = 0; index < total_steps; index++) {
-		vec3 local_position = current_pos - box_center;
+		float density = get_density(local_position / box_size + 0.5) * step_size;
+		// Почекать локалькую позицию
+		float sun_density = cast_ray_to_sun(local_position);
 
-		float density     = get_density(local_position / box_size + 0.5) * step_size;
-		float sun_density = cast_ray_to_sun(local_position, sun_steps);
-
-		current_pos += direction * step_size;
+		local_position += direction * step_size;
 
 		float sun_impact = exp(-sun_constant * sun_density);
 		float density_impact = density_constant * density;
@@ -230,6 +193,11 @@ vec4 raymarching(vec3 start_point, vec3 end_point, int iterations) {
 
 float phase_function(float cos_teta, float g) {
 	return (1.0 - pow(g, 2.0)) / (4.0 * PI * pow((1.0 + pow(g, 2.0) - 2.0 * g * cos_teta), 1.5));
+}
+
+void vertex() {
+	box_min = box_center - box_size / 2.0;
+	box_max = box_center + box_size / 2.0;
 }
 
 void fragment() {
@@ -254,7 +222,7 @@ void fragment() {
 		world_ray_origin
 	);
 
-	if (intersection.state != 2) {
+	if (!intersection.is_valid) {
 		discard;
 	}
 
