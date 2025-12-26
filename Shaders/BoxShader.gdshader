@@ -6,19 +6,25 @@ uniform sampler3D large_cloud_noise;
 uniform sampler3D medium_cloud_noise;
 uniform sampler3D small_cloud_noise;
 
-uniform int steps = 128;
-uniform int sun_steps = 8;
+uniform int steps		= 128;
+uniform int sun_steps	= 8;
 
 uniform vec3 box_center;
 uniform vec3 box_size;
 uniform vec3 box_angle;
 
-uniform float form_multiplier = 0.065;
-uniform float density_multiplier = 0.25;
+uniform float form_multiplier		= 0.065;
+uniform float density_multiplier	= 0.25;
 
-uniform vec3 light_direction  = vec3(1.0, -1.0, 1.0);
-uniform float density_constant = 1.0;
-uniform float sun_constant     = 1.0;
+uniform vec3 light_direction	= vec3(1.0, -1.0, 1.0);
+uniform float density_constant	= 1.0;
+uniform float sun_constant		= 1.0;
+uniform vec3 sunlight_color		= vec3(1.0);
+
+uniform float phase_impact_1	= 1.0;
+uniform float phase_impact_2	= 1.0;
+uniform float phase_const_1		= 0.0;
+uniform float phase_const_2		= 0.0;
 
 varying vec3 box_min;
 varying vec3 box_max;
@@ -51,7 +57,7 @@ struct IntersectionResult {
 IntersectionResult get_intersections(GetIntersectionsProps props) {
 	const float EPSILON = 1e-6;
 	vec3 dodge_inf = EPSILON * sign(props.ray_direction);
-	
+
 	vec3 inv_dir = 1.0 / (props.ray_direction + dodge_inf);
 
 	vec3 tbot = inv_dir * (box_min - props.ray_origin);
@@ -160,7 +166,13 @@ float cast_ray_to_sun(vec3 start_position) {
 	return full_density;
 }
 
-vec4 raymarching(vec3 start_point, vec3 end_point, int iterations) {
+float phase_function(float cos_teta, float g) {
+	const float base = (1.0 / 4.0 / PI);
+
+	return base * pow((1.0 - pow(g, 2.0)) / (1.0 + pow(g, 2.0) - 2.0 * g * cos_teta), 1.5);
+}
+
+vec4 raymarching(vec3 view_direction, vec3 start_point, vec3 end_point, int iterations) {
 	float total_distance = distance(start_point, end_point);
 	float step_size = length(box_size) / float(iterations);
 	int total_steps = int(total_distance / length(box_size) * float(iterations));
@@ -171,28 +183,32 @@ vec4 raymarching(vec3 start_point, vec3 end_point, int iterations) {
 	vec3 color = vec3(0.0);
 	float transmittance = 1.0;
 
+	float cos_teta = max(0, dot(view_direction, light_direction));
+
 	for (int index = 0; index < total_steps; index++) {
 		float density = get_density(local_position / box_size + 0.5) * step_size;
-		// Почекать локалькую позицию
 		float sun_density = cast_ray_to_sun(local_position);
 
 		local_position += direction * step_size;
 
+		float phase1 = phase_impact_1 * phase_function(cos_teta, phase_const_1);
+		float phase2 = phase_impact_2 * phase_function(cos_teta, phase_const_2);
+
 		float sun_impact = exp(-sun_constant * sun_density);
 		float density_impact = density_constant * density;
-		float light = sun_impact * density_impact;
 
-		color += light * transmittance;
+		float light = (phase1 + phase2) * sun_impact * density_impact;
+
+		color += sunlight_color * light * transmittance;
 		transmittance *= exp(-sun_constant * density);
 	}
 
 	vec4 result = vec4(color, 1.0 - transmittance);
 
-	return result;
-}
+	// Add phase function impact
+	//result *= phase_function();
 
-float phase_function(float cos_teta, float g) {
-	return (1.0 - pow(g, 2.0)) / (4.0 * PI * pow((1.0 + pow(g, 2.0) - 2.0 * g * cos_teta), 1.5));
+	return result;
 }
 
 void vertex() {
@@ -233,6 +249,7 @@ void fragment() {
 	}
 
 	vec4 result = raymarching(
+		local_ray_direction,
 		intersection.array[0],
 		intersection.array[1],
 		steps

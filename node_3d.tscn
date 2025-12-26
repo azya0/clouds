@@ -27,6 +27,11 @@ shader_parameter/density_multiplier = 0.25
 shader_parameter/light_direction = Vector3(0, -1, 0)
 shader_parameter/density_constant = 0.48
 shader_parameter/sun_constant = 0.47
+shader_parameter/sunlight_color = Vector3(1, 1, 1)
+shader_parameter/phase_impact_1 = 20.0
+shader_parameter/phase_impact_2 = 10.0
+shader_parameter/phase_const_1 = 0.9
+shader_parameter/phase_const_2 = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jka67"]
 render_priority = 0
@@ -41,6 +46,11 @@ shader_parameter/density_multiplier = 0.25
 shader_parameter/light_direction = Vector3(1, -1, 1)
 shader_parameter/density_constant = 1.0
 shader_parameter/sun_constant = 1.0
+shader_parameter/sunlight_color = Vector3(1, 1, 1)
+shader_parameter/phase_impact_1 = 1.0
+shader_parameter/phase_impact_2 = 1.0
+shader_parameter/phase_const_1 = 0.0
+shader_parameter/phase_const_2 = 0.0
 
 [node name="Node3D" type="Node3D"]
 
