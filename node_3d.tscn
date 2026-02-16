@@ -59,25 +59,35 @@ shader_parameter/perlin_noise = ExtResource("4_wc5p8")
 shader_parameter/large_cloud_noise = ExtResource("2_jka67")
 shader_parameter/medium_cloud_noise = ExtResource("3_i5arm")
 shader_parameter/small_cloud_noise = ExtResource("5_jsk3o")
-shader_parameter/steps = 256
-shader_parameter/sun_steps = 2
-shader_parameter/form_multiplier = 0.075
+shader_parameter/steps = 128
+shader_parameter/sun_steps = 0
+shader_parameter/form_multiplier = 0.08
 shader_parameter/light_direction = Vector3(0.408, -0.408, 0.816)
-shader_parameter/density_constant = 1.0
-shader_parameter/sun_constant = 1.0
+shader_parameter/density_constant = 0.48
+shader_parameter/sun_constant = 0.47
 shader_parameter/sunlight_color = Vector3(1, 1, 1)
 shader_parameter/phase_impact_1 = 20.0
 shader_parameter/phase_impact_2 = 10.0
 shader_parameter/phase_const_1 = 0.9
 shader_parameter/phase_const_2 = 0.4
 shader_parameter/wind_way = Vector3(1, 0, 0)
+shader_parameter/sky_top_color = Color(0.385, 0.454, 0.55, 1)
+shader_parameter/sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_sky_curve = 4.0
+shader_parameter/ground_bottom_color = Color(0.2, 0.169, 0.133, 1)
+shader_parameter/ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_ground_curve = 30.0
+shader_parameter/sun_angle_max = 0.877
+shader_parameter/inv_sun_curve = 22.78
+shader_parameter/exposure = 1.0
+shader_parameter/sky_cover_modulate = Color(1, 1, 1, 1)
 
 [sub_resource type="Sky" id="Sky_4arys"]
 sky_material = SubResource("ShaderMaterial_jsk3o")
 
 [sub_resource type="Environment" id="Environment_6iypd"]
 background_mode = 2
-background_energy_multiplier = 16.0
+background_canvas_max_layer = 1
 sky = SubResource("Sky_4arys")
 
 [node name="Node3D" type="Node3D" unique_id=1865247694]
@@ -92,5 +102,5 @@ material_overlay = SubResource("ShaderMaterial_wc5p8")
 size = Vector3(500, 250, 500)
 material = SubResource("ShaderMaterial_jka67")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=14208551]
+[node name="Clouds" type="WorldEnvironment" parent="." unique_id=14208551]
 environment = SubResource("Environment_6iypd")

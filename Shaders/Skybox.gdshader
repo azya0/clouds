@@ -11,16 +11,31 @@ uniform int sun_steps	= 8;
 uniform float form_multiplier		= 0.065;
 
 uniform vec3 light_direction	= vec3(1.0, -1.0, 1.0);
-uniform float density_constant	= 1.0;
-uniform float sun_constant		= 1.0;
+uniform float density_constant	= 0.48;
+uniform float sun_constant		= 0.47;
 uniform vec3 sunlight_color		= vec3(1.0);
 
-uniform float phase_impact_1	= 1.0;
-uniform float phase_impact_2	= 1.0;
-uniform float phase_const_1		= 0.0;
-uniform float phase_const_2		= 0.0;
+uniform float phase_impact_1	= 20.0;
+uniform float phase_impact_2	= 10.0;
+uniform float phase_const_1		= 0.9;
+uniform float phase_const_2		= 0.4;
 
 uniform vec3 wind_way = vec3(1.0, 0.0, 0.0);
+
+render_mode use_debanding;
+
+uniform vec4 sky_top_color : source_color = vec4(0.385, 0.454, 0.55, 1.0);
+uniform vec4 sky_horizon_color : source_color = vec4(0.646, 0.656, 0.67, 1.0);
+uniform float inv_sky_curve : hint_range(1, 100) = 4.0;
+uniform vec4 ground_bottom_color : source_color = vec4(0.2, 0.169, 0.133, 1.0);
+uniform vec4 ground_horizon_color : source_color = vec4(0.646, 0.656, 0.67, 1.0);
+uniform float inv_ground_curve : hint_range(1, 100) = 30.0;
+uniform float sun_angle_max = 0.877;
+uniform float inv_sun_curve : hint_range(1, 100) = 22.78;
+uniform float exposure : hint_range(0, 128) = 1.0;
+
+uniform sampler2D sky_cover : filter_linear, source_color, hint_default_black;
+uniform vec4 sky_cover_modulate : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 
 
 struct RayLimit {
@@ -76,8 +91,40 @@ float phase_function(float cos_teta, float g) {
 }
 
 
+// [-1; 1] -> [0; 1]
+vec3 to_noise_coords(vec3 coords) {
+	return coords / 2.0 + 0.5;
+}
+
+vec3 sphere_intersection(vec3 position, vec3 direction) {
+	float _dot = dot(position, direction);
+	float length_2 = pow(length(position), 2.0);
+	float _sqrt = sqrt(_dot * _dot + 1.0 - length_2);
+	
+	return position + direction * (-_dot + _sqrt);
+}
+
+
+float cast_ray_to_sun(vec3 position) {
+	vec3 direction = -normalize(light_direction);
+	vec3 end_position = sphere_intersection(position, direction);
+	vec3 step_size = (end_position - position) / float(sun_steps);
+	float step_length = length(step_size);
+
+	float full_density = 0.0;
+
+	for (int index = 0; index < sun_steps; index++) {
+		full_density += get_density(to_noise_coords(position)) * step_length;
+
+		position += step_size;
+	}
+
+	return full_density;
+}
+
+
 vec4 raymarching(vec3 wind_impact, vec3 direction) {
-	float step_size = 1.0 / float(steps);
+	float step_size = 0.25 / float(steps);
 	vec3 position = 0.75 * direction + wind_impact;
 	vec3 addition = direction * step_size;
 
@@ -87,12 +134,10 @@ vec4 raymarching(vec3 wind_impact, vec3 direction) {
 	float cos_teta = max(0, dot(direction, light_direction));
 
 	for (int index = 0; index < steps; index++) {
-		vec3 local_position = position / 2.0 + 0.5; // [-1; 1] -> [0; 1]
-		
-		float density = get_density(local_position) * step_size;
-		//float sun_density = cast_ray_to_sun(local_position);
+		float density = get_density(to_noise_coords(position)) * step_size;
+		// float sun_density = cast_ray_to_sun(position);
 		float sun_density = 0.0;
-
+		
 		position += addition;
 
 		float phase1 = phase_impact_1 * phase_function(cos_teta, phase_const_1);
@@ -116,11 +161,69 @@ vec4 raymarching(vec3 wind_impact, vec3 direction) {
 }
 
 
-void sky() {
-	vec3 wind_impact = TIME / 10.0 * wind_way;
-	//vec3 wind_impact = vec3(0.0);
-	vec3 direction = EYEDIR;
+vec3 get_base(vec3 direction) {
+	float v_angle = clamp(direction.y, -1.0, 1.0);
+	vec3 sky = mix(sky_top_color.rgb, sky_horizon_color.rgb, clamp(pow(1.0 - v_angle, inv_sky_curve), 0.0, 1.0));
+
+	if (LIGHT0_ENABLED) {
+		float sun_angle = dot(LIGHT0_DIRECTION, direction);
+		float sun_size = cos(LIGHT0_SIZE);
+		if (sun_angle > sun_size) {
+			sky = LIGHT0_COLOR * LIGHT0_ENERGY;
+		} else if (sun_angle > sun_angle_max) {
+			float c2 = (sun_size - sun_angle) / (sun_size - sun_angle_max);
+			sky = mix(sky, LIGHT0_COLOR * LIGHT0_ENERGY, clamp(pow(1.0 - c2, inv_sun_curve), 0.0, 1.0));
+		}
+	}
+
+	if (LIGHT1_ENABLED) {
+		float sun_angle = dot(LIGHT1_DIRECTION, direction);
+		float sun_size = cos(LIGHT1_SIZE);
+		if (sun_angle > sun_size) {
+			sky = LIGHT1_COLOR * LIGHT1_ENERGY;
+		} else if (sun_angle > sun_angle_max) {
+			float c2 = (sun_size - sun_angle) / (sun_size - sun_angle_max);
+			sky = mix(sky, LIGHT1_COLOR * LIGHT1_ENERGY, clamp(pow(1.0 - c2, inv_sun_curve), 0.0, 1.0));
+		}
+	}
+
+	if (LIGHT2_ENABLED) {
+		float sun_angle = dot(LIGHT2_DIRECTION, direction);
+		float sun_size = cos(LIGHT2_SIZE);
+		if (sun_angle > sun_size) {
+			sky = LIGHT2_COLOR * LIGHT2_ENERGY;
+		} else if (sun_angle > sun_angle_max) {
+			float c2 = (sun_size - sun_angle) / (sun_size - sun_angle_max);
+			sky = mix(sky, LIGHT2_COLOR * LIGHT2_ENERGY, clamp(pow(1.0 - c2, inv_sun_curve), 0.0, 1.0));
+		}
+	}
+
+	if (LIGHT3_ENABLED) {
+		float sun_angle = dot(LIGHT3_DIRECTION, direction);
+		float sun_size = cos(LIGHT3_SIZE);
+		if (sun_angle > sun_size) {
+			sky = LIGHT3_COLOR * LIGHT3_ENERGY;
+		} else if (sun_angle > sun_angle_max) {
+			float c2 = (sun_size - sun_angle) / (sun_size - sun_angle_max);
+			sky = mix(sky, LIGHT3_COLOR * LIGHT3_ENERGY, clamp(pow(1.0 - c2, inv_sun_curve), 0.0, 1.0));
+		}
+	}
 	
-	vec4 result = raymarching(wind_impact, direction);
-	COLOR = result.rgb;
+	vec3 ground = mix(ground_bottom_color.rgb, ground_horizon_color.rgb, clamp(pow(1.0 + v_angle, inv_ground_curve), 0.0, 1.0));
+
+	return mix(ground, sky, step(0.0, direction.y)) * exposure;
+}
+
+
+void sky() {
+	vec3 base = get_base(EYEDIR);
+	
+	if (EYEDIR.y >= 0.0) {
+		//vec3 wind_impact = TIME / 10.0 * wind_way;
+		vec3 wind_impact = vec3(0.0);
+		vec3 direction = EYEDIR;
+		
+		vec4 result = raymarching(wind_impact, direction);
+		COLOR = result.rgb;
+	}
 }
