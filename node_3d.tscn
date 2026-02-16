@@ -78,6 +78,7 @@ sky_material = SubResource("ShaderMaterial_jsk3o")
 [sub_resource type="Environment" id="Environment_6iypd"]
 background_mode = 2
 background_energy_multiplier = 16.0
+background_canvas_max_layer = 1
 sky = SubResource("Sky_4arys")
 
 [node name="Node3D" type="Node3D" unique_id=1865247694]
