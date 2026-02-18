@@ -8,8 +8,6 @@ uniform sampler3D small_cloud_noise;
 uniform int steps		= 128;
 uniform int sun_steps	= 8;
 
-uniform float form_multiplier	= 0.065;
-
 uniform vec3 light_direction	= vec3(1.0, -1.0, 1.0);
 uniform float density_constant	= 1.0;
 uniform float sun_constant		= 1.0;
@@ -28,9 +26,10 @@ struct RayLimit {
 	vec3 end;	
 };
 
+uniform float fluffiness_coefficient = 1.0;
 
 float get_vorley_noise(sampler3D noise, vec3 position) {
-    return texture(noise, position * form_multiplier).r;
+    return texture(noise, position * fluffiness_coefficient).r;
 }
 
 float get_perlin_noise(vec3 position) {
@@ -53,7 +52,7 @@ float get_cloud_form(vec3 position) {
 	);
 }
 
-uniform float weather_map_constans = 1.5;
+uniform float weather_map_constans = 1.355;
 
 float get_cloud_map(vec3 position) {
 	float value = get_perlin_noise(position);

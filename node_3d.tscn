@@ -74,7 +74,6 @@ shader_parameter/medium_cloud_noise = ExtResource("3_i5arm")
 shader_parameter/small_cloud_noise = ExtResource("5_jsk3o")
 shader_parameter/steps = 128
 shader_parameter/sun_steps = 2
-shader_parameter/form_multiplier = 1.0
 shader_parameter/light_direction = Vector3(0.408, -0.408, 0.816)
 shader_parameter/density_constant = 1.0
 shader_parameter/sun_constant = 1.0
@@ -84,10 +83,11 @@ shader_parameter/phase_impact_2 = 10.0
 shader_parameter/phase_const_1 = 0.9
 shader_parameter/phase_const_2 = 0.4
 shader_parameter/wind_way = Vector3(0.25, 0, 0)
-shader_parameter/large_cloud_form_const = 0.015
-shader_parameter/medium_cloud_form_const = 0.03
-shader_parameter/small_cloud_form_const = 0.1
-shader_parameter/weather_map_constans = 1.5
+shader_parameter/fluffiness_coefficient = 1.355
+shader_parameter/large_cloud_form_const = 0.045
+shader_parameter/medium_cloud_form_const = 0.015
+shader_parameter/small_cloud_form_const = 0.15
+shader_parameter/weather_map_constans = 1.0
 
 [sub_resource type="Sky" id="Sky_4arys"]
 sky_material = SubResource("ShaderMaterial_jsk3o")
