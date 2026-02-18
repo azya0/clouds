@@ -6,7 +6,6 @@ uniform sampler3D medium_cloud_noise;
 uniform sampler3D small_cloud_noise;
 
 uniform int steps		= 128;
-uniform int sun_steps	= 8;
 
 uniform vec3 light_direction	= vec3(1.0, -1.0, 1.0);
 uniform float density_constant	= 1.0;
@@ -19,12 +18,6 @@ uniform float phase_const_1		= 0.0;
 uniform float phase_const_2		= 0.0;
 
 uniform vec3 wind_way = vec3(1.0, 0.0, 0.0);
-
-
-struct RayLimit {
-	vec3 start;
-	vec3 end;	
-};
 
 uniform float fluffiness_coefficient = 1.0;
 
@@ -79,29 +72,69 @@ float phase_function(float cos_teta, float g) {
 }
 
 
-vec4 raymarching(vec3 wind_impact, vec3 direction) {
-	float step_size = 0.15 / float(steps);
-	vec3 position = 0.75 * direction + wind_impact;
-	vec3 addition = direction * step_size;
+vec3 get_sphere_intersection(vec3 position, vec3 direction) {
+	float _dot = dot(position, direction);
+	
+	float _sqrt = sqrt(pow(_dot, 2.0) + 1.0 - pow(length(position), 2.0));
+	
+	return position + direction * (-_dot + _sqrt);
+}
 
-	vec3 color = vec3(0.0);
-	float transmittance = 1.0;
 
-	float cos_teta = max(0, dot(direction, light_direction));
+vec3 to_density_func_coords(vec3 position) {
+	return position / 2.0 + 0.5; // [-1; 1] -> [0; 1]
+}
 
-	for (int index = 0; index < steps; index++) {
-		vec3 local_position = position / 2.0 + 0.5; // [-1; 1] -> [0; 1]
+uniform int sun_steps	= 8;
+
+float cast_ray_to_sun(vec3 position) {
+	if (sun_steps <= 0) {
+		return 1.0;
+	}
+	
+	vec3 direction = -normalize(light_direction);
+	vec3 end_point = get_sphere_intersection(position, direction);
+	float step_size = distance(end_point, position) / float(sun_steps);
+	vec3 addition  = direction * step_size;
+
+	float full_density = 0.0;
+
+	for (int index = 0; index < sun_steps; index++) {
+		vec3 local_position = to_density_func_coords(position);
 		
-		float density = get_density(local_position) * step_size;
-		//float sun_density = cast_ray_to_sun(position);
-		float sun_density = 0.0;
+		full_density += get_density(local_position);
 
 		position += addition;
+	}
+
+	return full_density * step_size;
+}
+
+uniform float percentage_troposphere = 0.25;
+
+vec4 raymarching(vec3 direction) {
+	float step_size = percentage_troposphere / float(steps);
+	vec3 position = (1. - percentage_troposphere) * direction;
+	vec3 addition = direction * step_size;
+
+	vec3 color = vec3(0.);
+	float transmittance = 1.;
+
+	float cos_teta = max(0, dot(direction, normalize(light_direction)));
+
+	for (int index = 0; index < steps; index++) {
+		vec3 local_position = to_density_func_coords(position);
+		
+		float density = get_density(local_position) * step_size;
+		float sun_density = cast_ray_to_sun(position);
+
+		position += addition;
+		
+		float sun_impact = exp(-sun_constant * sun_density);
 
 		float phase1 = phase_impact_1 * phase_function(cos_teta, phase_const_1);
 		float phase2 = phase_impact_2 * phase_function(cos_teta, phase_const_2);
-
-		float sun_impact = exp(-sun_constant * sun_density);
+		
 		float density_impact = density_constant * density;
 
 		float light = (phase1 + phase2) * sun_impact * density_impact;
@@ -125,7 +158,7 @@ void sky() {
 		//vec3 wind_impact = vec3(0.0);
 		vec3 direction = EYEDIR;
 		
-		vec4 result = raymarching(wind_impact, direction);
+		vec4 result = raymarching(direction);
 		COLOR = result.rgb;
 	}
 	
