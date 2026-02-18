@@ -8,7 +8,7 @@ uniform sampler3D small_cloud_noise;
 uniform int steps		= 128;
 uniform int sun_steps	= 8;
 
-uniform float form_multiplier		= 0.065;
+uniform float form_multiplier	= 0.065;
 
 uniform vec3 light_direction	= vec3(1.0, -1.0, 1.0);
 uniform float density_constant	= 1.0;
@@ -29,43 +29,47 @@ struct RayLimit {
 };
 
 
-float process_noise(sampler3D noise, vec3 position) {
-    return clamp((1.0 - texture(noise, position).r) * 1.5 - 0.25, 0.0, 1.0);
+float get_vorley_noise(sampler3D noise, vec3 position) {
+    return texture(noise, position * form_multiplier).r;
 }
 
-float remap(float value, float _min, float _max, float r_min, float r_max) {
-    return r_min + (value - _min) / (_max - _min) * (r_max - r_min);
+float get_perlin_noise(vec3 position) {
+	return texture(perlin_noise, position).r;
 }
 
-float low_frequency_noise(float high_frequency_value, vec3 position) {
-	float perlin_value = texture(perlin_noise, position).r;
+uniform float large_cloud_form_const = 1.0;
+uniform float medium_cloud_form_const = 1.0;
+uniform float small_cloud_form_const = 1.0;
 
-	return remap(
-		perlin_value,
-		high_frequency_value - 1.0, 1.0, 0.0, 1.0
+float get_cloud_form(vec3 position) {
+	float worley_larger = get_vorley_noise(large_cloud_noise, position);
+	float worley_medium = get_vorley_noise(medium_cloud_noise, position);
+	float worley_small = get_vorley_noise(small_cloud_noise, position);
+
+	return (
+		worley_larger * large_cloud_form_const +
+	    worley_medium * medium_cloud_form_const +
+		worley_small * small_cloud_form_const
 	);
 }
 
-float high_frequency_noise(vec3 position) {
-	float worley_larger = process_noise(large_cloud_noise, position);
-	float worley_medium = process_noise(medium_cloud_noise, position);
-	float worley_small = process_noise(small_cloud_noise, position);
+uniform float weather_map_constans = 1.5;
 
-	return worley_larger * 0.625 + worley_medium * 0.25 + worley_small * 0.125;
+float get_cloud_map(vec3 position) {
+	float value = get_perlin_noise(position);
+	
+	return value * weather_map_constans;
 }
 
 
 float get_density(vec3 position) {
-	float high_octave = high_frequency_noise(position);
-	float low_octave = low_frequency_noise(high_octave, position);
-
-	float result = (high_octave * 0.15 + low_octave * 0.85) * form_multiplier;
-
-	if (result < 0.05) {
+	float value = get_cloud_form(position) * get_cloud_map(position);
+	
+	if (value < 0.05) {
 		return 0.0;
 	}
-
-	return result;
+	
+	return value;
 }
 
 
@@ -77,7 +81,7 @@ float phase_function(float cos_teta, float g) {
 
 
 vec4 raymarching(vec3 wind_impact, vec3 direction) {
-	float step_size = 1.0 / float(steps);
+	float step_size = 0.15 / float(steps);
 	vec3 position = 0.75 * direction + wind_impact;
 	vec3 addition = direction * step_size;
 
@@ -90,7 +94,7 @@ vec4 raymarching(vec3 wind_impact, vec3 direction) {
 		vec3 local_position = position / 2.0 + 0.5; // [-1; 1] -> [0; 1]
 		
 		float density = get_density(local_position) * step_size;
-		//float sun_density = cast_ray_to_sun(local_position);
+		//float sun_density = cast_ray_to_sun(position);
 		float sun_density = 0.0;
 
 		position += addition;
@@ -117,10 +121,13 @@ vec4 raymarching(vec3 wind_impact, vec3 direction) {
 
 
 void sky() {
-	vec3 wind_impact = TIME / 10.0 * wind_way;
-	//vec3 wind_impact = vec3(0.0);
-	vec3 direction = EYEDIR;
+	if (EYEDIR.y >= 0.0) {
+		vec3 wind_impact = TIME / 10.0 * wind_way;
+		//vec3 wind_impact = vec3(0.0);
+		vec3 direction = EYEDIR;
+		
+		vec4 result = raymarching(wind_impact, direction);
+		COLOR = result.rgb;
+	}
 	
-	vec4 result = raymarching(wind_impact, direction);
-	COLOR = result.rgb;
 }
