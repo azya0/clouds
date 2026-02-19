@@ -1,0 +1,14 @@
+[gd_resource type="Texture3DRD" script_class="GPUNoiseTexture3D" format=3 uid="uid://cnsch3yqn4g01"]
+
+[ext_resource type="Script" uid="uid://dtpuik8kpf4eg" path="res://addons/gpu_noise_texture/gpu_noise_texture_3d.gd" id="1_brujd"]
+[ext_resource type="RDShaderFile" uid="uid://dv2xgend232nn" path="res://addons/gpu_noise_texture/examples/shaders/psrdnoise_3d.glsl" id="2_1s1ev"]
+
+[resource]
+script = ExtResource("1_brujd")
+shader_file = ExtResource("2_1s1ev")
+width = 128
+height = 128
+depth = 128
+invert = true
+frequency = 0.4
+metadata/_custom_type_script = "uid://dtpuik8kpf4eg"

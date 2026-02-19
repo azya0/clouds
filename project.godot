@@ -18,3 +18,7 @@ config/name="MyOwnClouds"
 run/main_scene="uid://b1584h54rsh1h"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gpu_noise_texture/plugin.cfg")

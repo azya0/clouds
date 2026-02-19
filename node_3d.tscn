@@ -1,10 +1,7 @@
 [gd_scene format=3 uid="uid://b1584h54rsh1h"]
 
 [ext_resource type="Shader" uid="uid://clskak4vfucsp" path="res://Shaders/BoxShader.gdshader" id="1_a202f"]
-[ext_resource type="NoiseTexture3D" uid="uid://6ed3lvlpbqmg" path="res://NoiseTextures/LargeScaleNoise.tres" id="2_jka67"]
-[ext_resource type="NoiseTexture3D" uid="uid://dxyewgt7o40m0" path="res://NoiseTextures/MediumScaleNoise.tres" id="3_i5arm"]
-[ext_resource type="NoiseTexture3D" uid="uid://dv4e7882w16d4" path="res://NoiseTextures/PerlinNoise.tres" id="4_wc5p8"]
-[ext_resource type="NoiseTexture3D" uid="uid://bnck2kxeg5bkg" path="res://NoiseTextures/SmallScaleNoise.tres" id="5_jsk3o"]
+[ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="3_a0tk4"]
 [ext_resource type="Shader" uid="uid://kxo5txsekwmn" path="res://Shaders/Skybox.gdshader" id="6_i5arm"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i5arm"]
@@ -14,10 +11,6 @@ albedo_color = Color(1, 1, 1, 0)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wc5p8"]
 render_priority = 0
 shader = ExtResource("1_a202f")
-shader_parameter/perlin_noise = ExtResource("4_wc5p8")
-shader_parameter/large_cloud_noise = ExtResource("2_jka67")
-shader_parameter/medium_cloud_noise = ExtResource("3_i5arm")
-shader_parameter/small_cloud_noise = ExtResource("5_jsk3o")
 shader_parameter/steps = 256
 shader_parameter/sun_steps = 10
 shader_parameter/box_center = Vector3(0, 0, 0)
@@ -66,28 +59,68 @@ depth = 128
 noise = SubResource("FastNoiseLite_i5arm")
 invert = true
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_noarx"]
+noise_type = 2
+seed = 1244312
+frequency = 0.0255
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_a0tk4"]
+width = 128
+height = 128
+depth = 128
+noise = SubResource("FastNoiseLite_noarx")
+invert = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_r3fl7"]
+noise_type = 3
+frequency = 0.0224
+offset = Vector3(134.3, 575.76, 0)
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_jka67"]
+width = 128
+height = 128
+depth = 128
+noise = SubResource("FastNoiseLite_r3fl7")
+invert = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wc5p8"]
+noise_type = 2
+frequency = 0.0811
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_jsk3o"]
+width = 128
+height = 128
+depth = 128
+noise = SubResource("FastNoiseLite_wc5p8")
+invert = true
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jsk3o"]
 shader = ExtResource("6_i5arm")
-shader_parameter/perlin_noise = ExtResource("4_wc5p8")
+shader_parameter/perlin_noise = SubResource("NoiseTexture3D_jka67")
 shader_parameter/large_cloud_noise = SubResource("NoiseTexture3D_wc5p8")
-shader_parameter/medium_cloud_noise = ExtResource("3_i5arm")
-shader_parameter/small_cloud_noise = ExtResource("5_jsk3o")
-shader_parameter/steps = 32
+shader_parameter/medium_cloud_noise = SubResource("NoiseTexture3D_a0tk4")
+shader_parameter/small_cloud_noise = SubResource("NoiseTexture3D_jsk3o")
+shader_parameter/curl_noise = ExtResource("3_a0tk4")
+shader_parameter/steps = 64
 shader_parameter/light_direction = Vector3(1, -1, 0)
 shader_parameter/density_constant = 1.0
 shader_parameter/sun_constant = 200.0
-shader_parameter/sunlight_color = Vector3(1, 1, 1)
+shader_parameter/sunlight_color = Vector3(9.36, 5.13, 16.06)
 shader_parameter/phase_impact_1 = 20.0
 shader_parameter/phase_impact_2 = 10.0
 shader_parameter/phase_const_1 = 0.9
 shader_parameter/phase_const_2 = 0.4
 shader_parameter/wind_way = Vector3(0, 0, 0)
 shader_parameter/fluffiness_coefficient = 1.355
-shader_parameter/large_cloud_form_const = 0.045
-shader_parameter/medium_cloud_form_const = 0.015
-shader_parameter/small_cloud_form_const = 0.15
-shader_parameter/weather_map_constans = 1.0
-shader_parameter/sun_steps = 32
+shader_parameter/large_cloud_form_const = 0.185
+shader_parameter/medium_cloud_form_const = 0.16
+shader_parameter/small_cloud_form_const = 0.285
+shader_parameter/weather_map_constans = 0.28
+shader_parameter/curl_steps = 3
+shader_parameter/curl_offset = 0.0
+shader_parameter/curl_intensivity = 0.035
+shader_parameter/edges_wind_power = 0.001
+shader_parameter/sun_steps = 0
 shader_parameter/percentage_troposphere = 0.25
 
 [sub_resource type="Sky" id="Sky_4arys"]

@@ -4,6 +4,7 @@ uniform sampler3D perlin_noise;
 uniform sampler3D large_cloud_noise;
 uniform sampler3D medium_cloud_noise;
 uniform sampler3D small_cloud_noise;
+uniform sampler3D curl_noise;
 
 uniform int steps		= 128;
 
@@ -53,9 +54,29 @@ float get_cloud_map(vec3 position) {
 	return value * weather_map_constans;
 }
 
+uniform int curl_steps         = 3;
+uniform float curl_offset      = 0.;
+uniform float curl_intensivity = 0.05;
+uniform float edges_wind_power = 0.005;
+
+
+vec3 move_by_curl(vec3 position) {
+	vec3 result_position = position;
+	
+	for (int index = 0; index < curl_steps; index++) {
+		vec3 curl_position = texture(curl_noise, result_position + TIME * edges_wind_power).xyz;
+		result_position += curl_position * curl_intensivity;
+	}
+	
+	return result_position;
+}
 
 float get_density(vec3 position) {
-	float value = get_cloud_form(position) * get_cloud_map(position);
+	// Добавить ветер
+    
+    float cloud_map = get_cloud_map(position);
+	
+	float value = get_cloud_form(move_by_curl(position)) * cloud_map;
 	
 	if (value < 0.05) {
 		return 0.0;
@@ -89,7 +110,7 @@ uniform int sun_steps	= 8;
 
 float cast_ray_to_sun(vec3 position) {
 	if (sun_steps <= 0) {
-		return 1.0;
+		return 0.0;
 	}
 	
 	vec3 direction = -normalize(light_direction);
