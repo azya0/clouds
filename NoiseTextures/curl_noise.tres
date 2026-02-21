@@ -6,9 +6,9 @@
 [resource]
 script = ExtResource("1_brujd")
 shader_file = ExtResource("2_1s1ev")
-width = 128
-height = 128
-depth = 128
+width = 256
+height = 256
+depth = 256
 invert = true
-frequency = 0.4
+frequency = 0.167
 metadata/_custom_type_script = "uid://dtpuik8kpf4eg"

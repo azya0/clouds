@@ -18,8 +18,6 @@ uniform float phase_impact_2	= 1.0;
 uniform float phase_const_1		= 0.0;
 uniform float phase_const_2		= 0.0;
 
-uniform vec3 wind_way = vec3(1.0, 0.0, 0.0);
-
 uniform float fluffiness_coefficient = 1.0;
 
 float get_vorley_noise(sampler3D noise, vec3 position) {
@@ -55,7 +53,6 @@ float get_cloud_map(vec3 position) {
 }
 
 uniform int curl_steps         = 3;
-uniform float curl_offset      = 0.;
 uniform float curl_intensivity = 0.05;
 uniform float edges_wind_power = 0.005;
 
@@ -71,12 +68,16 @@ vec3 move_by_curl(vec3 position) {
 	return result_position;
 }
 
+uniform vec3 wind_direction = vec3(1., 0., 0.);
+
 float get_density(vec3 position) {
-	// Добавить ветер
+	vec3 wind_impact = TIME / 100.0 * wind_direction;
     
     float cloud_map = get_cloud_map(position);
 	
-	float value = get_cloud_form(move_by_curl(position)) * cloud_map;
+	vec3 moved_position = move_by_curl(position) + wind_impact;
+	
+	float value = get_cloud_form(moved_position) * cloud_map;
 	
 	if (value < 0.05) {
 		return 0.0;
@@ -175,8 +176,6 @@ vec4 raymarching(vec3 direction) {
 
 void sky() {
 	if (EYEDIR.y >= 0.0) {
-		vec3 wind_impact = TIME / 10.0 * wind_way;
-		//vec3 wind_impact = vec3(0.0);
 		vec3 direction = EYEDIR;
 		
 		vec4 result = raymarching(direction);
