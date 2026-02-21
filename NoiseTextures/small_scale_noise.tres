@@ -1,0 +1,14 @@
+[gd_resource type="NoiseTexture3D" format=3 uid="uid://48ap4m7uw7em"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wc5p8"]
+noise_type = 2
+seed = 2353535
+frequency = 0.0811
+
+[resource]
+width = 256
+height = 256
+depth = 256
+noise = SubResource("FastNoiseLite_wc5p8")
+seamless = true
+invert = true

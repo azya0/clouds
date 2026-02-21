@@ -2,7 +2,11 @@
 
 [ext_resource type="Shader" uid="uid://clskak4vfucsp" path="res://Shaders/BoxShader.gdshader" id="1_a202f"]
 [ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="3_a0tk4"]
+[ext_resource type="NoiseTexture3D" uid="uid://dihd7a3ljlv4m" path="res://NoiseTextures/large_scale_noise.tres" id="4_wc5p8"]
+[ext_resource type="NoiseTexture3D" uid="uid://citnglwac7vnd" path="res://NoiseTextures/medium_scale_noise.tres" id="5_jsk3o"]
+[ext_resource type="NoiseTexture3D" uid="uid://d2ugt60pctu2d" path="res://NoiseTextures/perlin_noise.tres" id="6_4arys"]
 [ext_resource type="Shader" uid="uid://kxo5txsekwmn" path="res://Shaders/Skybox.gdshader" id="6_i5arm"]
+[ext_resource type="NoiseTexture3D" uid="uid://48ap4m7uw7em" path="res://NoiseTextures/small_scale_noise.tres" id="7_6iypd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i5arm"]
 transparency = 1
@@ -46,66 +50,12 @@ shader_parameter/phase_impact_2 = 1.0
 shader_parameter/phase_const_1 = 0.0
 shader_parameter/phase_const_2 = 0.0
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_i5arm"]
-noise_type = 2
-seed = 2355
-frequency = 0.0064
-offset = Vector3(26.38, -233.08, 0)
-
-[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_wc5p8"]
-width = 256
-height = 256
-depth = 256
-noise = SubResource("FastNoiseLite_i5arm")
-seamless = true
-invert = true
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_noarx"]
-noise_type = 2
-seed = 1244312
-frequency = 0.0255
-
-[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_a0tk4"]
-width = 256
-height = 256
-depth = 256
-noise = SubResource("FastNoiseLite_noarx")
-seamless = true
-invert = true
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_r3fl7"]
-noise_type = 3
-seed = 123
-frequency = 0.0204
-offset = Vector3(134.3, 242.43, 0)
-
-[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_jka67"]
-width = 256
-height = 256
-depth = 256
-noise = SubResource("FastNoiseLite_r3fl7")
-seamless = true
-invert = true
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_wc5p8"]
-noise_type = 2
-seed = 2353535
-frequency = 0.0811
-
-[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_jsk3o"]
-width = 256
-height = 256
-depth = 256
-noise = SubResource("FastNoiseLite_wc5p8")
-seamless = true
-invert = true
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jsk3o"]
 shader = ExtResource("6_i5arm")
-shader_parameter/perlin_noise = SubResource("NoiseTexture3D_jka67")
-shader_parameter/large_cloud_noise = SubResource("NoiseTexture3D_wc5p8")
-shader_parameter/medium_cloud_noise = SubResource("NoiseTexture3D_a0tk4")
-shader_parameter/small_cloud_noise = SubResource("NoiseTexture3D_jsk3o")
+shader_parameter/perlin_noise = ExtResource("6_4arys")
+shader_parameter/large_cloud_noise = ExtResource("4_wc5p8")
+shader_parameter/medium_cloud_noise = ExtResource("5_jsk3o")
+shader_parameter/small_cloud_noise = ExtResource("7_6iypd")
 shader_parameter/curl_noise = ExtResource("3_a0tk4")
 shader_parameter/steps = 64
 shader_parameter/light_direction = Vector3(0, -1, 0)

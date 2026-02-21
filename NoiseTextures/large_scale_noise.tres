@@ -1,0 +1,15 @@
+[gd_resource type="NoiseTexture3D" format=3 uid="uid://dihd7a3ljlv4m"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_i5arm"]
+noise_type = 2
+seed = 2355
+frequency = 0.0064
+offset = Vector3(26.38, -233.08, 0)
+
+[resource]
+width = 256
+height = 256
+depth = 256
+noise = SubResource("FastNoiseLite_i5arm")
+seamless = true
+invert = true
