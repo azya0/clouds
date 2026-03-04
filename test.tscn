@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dn7k03wfd7l7n"]
+
+[ext_resource type="Script" uid="uid://r41yjaee0vu2" path="res://Scripts/static_texture.gd" id="1_8uh7m"]
+[ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="2_8uh7m"]
+
+[node name="Test" type="Node3D" unique_id=684819331]
+
+[node name="Node3D" type="Node3D" parent="." unique_id=697077221]
+script = ExtResource("1_8uh7m")
+source_noise_texture = ExtResource("2_8uh7m")
+output_path = "res://Dataset/CurlImage.tres"

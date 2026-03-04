@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b1584h54rsh1h"]
 
 [ext_resource type="Shader" uid="uid://clskak4vfucsp" path="res://Shaders/BoxShader.gdshader" id="1_a202f"]
+[ext_resource type="Script" uid="uid://bqljv4kfeivwc" path="res://Scripts/datatset_collector.gd" id="1_jsk3o"]
 [ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="3_a0tk4"]
 [ext_resource type="NoiseTexture3D" uid="uid://dihd7a3ljlv4m" path="res://NoiseTextures/large_scale_noise.tres" id="4_wc5p8"]
 [ext_resource type="NoiseTexture3D" uid="uid://citnglwac7vnd" path="res://NoiseTextures/medium_scale_noise.tres" id="5_jsk3o"]
@@ -57,24 +58,24 @@ shader_parameter/large_cloud_noise = ExtResource("4_wc5p8")
 shader_parameter/medium_cloud_noise = ExtResource("5_jsk3o")
 shader_parameter/small_cloud_noise = ExtResource("7_6iypd")
 shader_parameter/curl_noise = ExtResource("3_a0tk4")
-shader_parameter/steps = 32
+shader_parameter/steps = 64
 shader_parameter/light_direction = Vector3(0, -1, 0)
 shader_parameter/density_constant = 1.0
-shader_parameter/sun_constant = 250.0
-shader_parameter/sunlight_color = Vector3(6, 6, 8.575)
+shader_parameter/sun_constant = 200.0
+shader_parameter/sunlight_color = Vector3(6, 6, 6)
 shader_parameter/phase_impact_1 = 20.0
 shader_parameter/phase_impact_2 = 10.0
 shader_parameter/phase_const_1 = 0.9
 shader_parameter/phase_const_2 = 0.4
-shader_parameter/fluffiness_coefficient = 1.355
-shader_parameter/large_cloud_form_const = 1.085
-shader_parameter/medium_cloud_form_const = 0.79
-shader_parameter/small_cloud_form_const = 1.37
-shader_parameter/weather_map_constans = 0.058
+shader_parameter/fluffiness_coefficient = 1.0
+shader_parameter/large_cloud_form_const = 1.515
+shader_parameter/medium_cloud_form_const = 1.375
+shader_parameter/small_cloud_form_const = 1.5
+shader_parameter/weather_map_constans = 0.028
 shader_parameter/curl_steps = 3
-shader_parameter/curl_intensivity = 0.02
+shader_parameter/curl_intensivity = 0.015
 shader_parameter/edges_wind_power = 0.002
-shader_parameter/wind_direction = Vector3(0.2, 0, 0)
+shader_parameter/wind_direction = Vector3(1, 0, 0)
 shader_parameter/sun_steps = 0
 shader_parameter/percentage_troposphere = 0.25
 
@@ -88,6 +89,7 @@ background_canvas_max_layer = 1
 sky = SubResource("Sky_4arys")
 
 [node name="Node3D" type="Node3D" unique_id=1865247694]
+script = ExtResource("1_jsk3o")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=986445967]
 transform = Transform3D(0.999159, 0, -0.041003738, 0.014024103, 0.9396926, 0.34173247, 0.03853091, -0.34202012, 0.9389023, 1, 31.4, 53.9)

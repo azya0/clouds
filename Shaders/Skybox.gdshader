@@ -28,6 +28,14 @@ float get_perlin_noise(vec3 position) {
 	return texture(perlin_noise, position).r;
 }
 
+vec3 to_01(vec3 position) {
+	return position / 2.0 + 0.5; // [-1; 1] -> [0; 1]
+}
+
+float to_01(float value) {
+	return value / 2.0 + 0.5; // [-1; 1] -> [0; 1]
+}
+
 uniform float large_cloud_form_const = 1.0;
 uniform float medium_cloud_form_const = 1.0;
 uniform float small_cloud_form_const = 1.0;
@@ -44,24 +52,26 @@ float get_cloud_form(vec3 position) {
 	);
 }
 
-uniform float weather_map_constans = 1.355;
+uniform float weather_map_constans = 0.035;
 
 float get_cloud_map(vec3 position) {
 	float value = get_perlin_noise(position);
 	
-	return value * weather_map_constans;
+	return to_01(value) * weather_map_constans;
 }
 
 uniform int curl_steps         = 3;
-uniform float curl_intensivity = 0.05;
-uniform float edges_wind_power = 0.005;
+uniform float curl_intensivity = 0.02;
+uniform float edges_wind_power = 0.002;
 
 
-vec3 move_by_curl(vec3 position) {
+vec3 move_by_curl(vec3 position, float time) {
 	vec3 result_position = position;
 	
 	for (int index = 0; index < curl_steps; index++) {
-		vec3 curl_position = texture(curl_noise, result_position + TIME * edges_wind_power).xyz;
+		vec3 curl_coords = result_position + time * edges_wind_power;
+		
+		vec3 curl_position = texture(curl_noise, curl_coords).xyz;
 		result_position += curl_position * curl_intensivity;
 	}
 	
@@ -70,12 +80,12 @@ vec3 move_by_curl(vec3 position) {
 
 uniform vec3 wind_direction = vec3(1., 0., 0.);
 
-float get_density(vec3 position) {
-	vec3 wind_impact = TIME / 100.0 * wind_direction;
+float get_density(vec3 position, float time) {
+	vec3 wind_impact = time / 100.0 * -wind_direction;
     
     float cloud_map = get_cloud_map(position);
 	
-	vec3 moved_position = move_by_curl(position) + wind_impact;
+	vec3 moved_position = move_by_curl(position, time) + wind_impact;
 	
 	float value = get_cloud_form(moved_position) * cloud_map;
 	
@@ -102,14 +112,9 @@ vec3 get_sphere_intersection(vec3 position, vec3 direction) {
 	return position + direction * (-_dot + _sqrt);
 }
 
-
-vec3 to_density_func_coords(vec3 position) {
-	return position / 2.0 + 0.5; // [-1; 1] -> [0; 1]
-}
-
 uniform int sun_steps	= 8;
 
-float cast_ray_to_sun(vec3 position) {
+float cast_ray_to_sun(vec3 position, float current_time) {
 	if (sun_steps <= 0) {
 		return 0.0;
 	}
@@ -122,9 +127,9 @@ float cast_ray_to_sun(vec3 position) {
 	float full_density = 0.0;
 
 	for (int index = 0; index < sun_steps; index++) {
-		vec3 local_position = to_density_func_coords(position);
+		vec3 local_position = to_01(position);
 		
-		full_density += get_density(local_position);
+		full_density += get_density(local_position, current_time);
 
 		position += addition;
 	}
@@ -143,19 +148,21 @@ vec4 raymarching(vec3 direction) {
 	float transmittance = 1.;
 
 	float cos_teta = max(0, dot(direction, normalize(light_direction)));
+	
+	float phase1 = phase_impact_1 * phase_function(cos_teta, phase_const_1);
+	float phase2 = phase_impact_2 * phase_function(cos_teta, phase_const_2);
+	
+	float current_time = TIME;
 
 	for (int index = 0; index < steps; index++) {
-		vec3 local_position = to_density_func_coords(position);
+		vec3 local_position = to_01(position);
 		
-		float density = get_density(local_position) * step_size;
-		float sun_density = cast_ray_to_sun(position);
+		float density = get_density(local_position, current_time) * step_size;
+		float sun_density = cast_ray_to_sun(position, current_time);
 
 		position += addition;
 		
 		float sun_impact = exp(-sun_constant * sun_density);
-
-		float phase1 = phase_impact_1 * phase_function(cos_teta, phase_const_1);
-		float phase2 = phase_impact_2 * phase_function(cos_teta, phase_const_2);
 		
 		float density_impact = density_constant * density;
 
