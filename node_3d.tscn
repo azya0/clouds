@@ -3,11 +3,11 @@
 [ext_resource type="Shader" uid="uid://clskak4vfucsp" path="res://Shaders/BoxShader.gdshader" id="1_a202f"]
 [ext_resource type="Script" uid="uid://bqljv4kfeivwc" path="res://Scripts/datatset_collector.gd" id="1_jsk3o"]
 [ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="3_a0tk4"]
-[ext_resource type="NoiseTexture3D" uid="uid://dihd7a3ljlv4m" path="res://NoiseTextures/large_scale_noise.tres" id="4_wc5p8"]
-[ext_resource type="NoiseTexture3D" uid="uid://citnglwac7vnd" path="res://NoiseTextures/medium_scale_noise.tres" id="5_jsk3o"]
-[ext_resource type="NoiseTexture3D" uid="uid://d2ugt60pctu2d" path="res://NoiseTextures/perlin_noise.tres" id="6_4arys"]
+[ext_resource type="ImageTexture3D" uid="uid://b1v8adpxxovhr" path="res://Dataset/LargeImage.tres" id="5_jsk3o"]
+[ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="6_4arys"]
 [ext_resource type="Shader" uid="uid://kxo5txsekwmn" path="res://Shaders/Skybox.gdshader" id="6_i5arm"]
-[ext_resource type="NoiseTexture3D" uid="uid://48ap4m7uw7em" path="res://NoiseTextures/small_scale_noise.tres" id="7_6iypd"]
+[ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="7_6iypd"]
+[ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="8_tereu"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i5arm"]
 transparency = 1
@@ -53,10 +53,10 @@ shader_parameter/phase_const_2 = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jsk3o"]
 shader = ExtResource("6_i5arm")
-shader_parameter/perlin_noise = ExtResource("6_4arys")
-shader_parameter/large_cloud_noise = ExtResource("4_wc5p8")
-shader_parameter/medium_cloud_noise = ExtResource("5_jsk3o")
-shader_parameter/small_cloud_noise = ExtResource("7_6iypd")
+shader_parameter/perlin_noise = ExtResource("7_6iypd")
+shader_parameter/large_cloud_noise = ExtResource("5_jsk3o")
+shader_parameter/medium_cloud_noise = ExtResource("6_4arys")
+shader_parameter/small_cloud_noise = ExtResource("8_tereu")
 shader_parameter/curl_noise = ExtResource("3_a0tk4")
 shader_parameter/steps = 64
 shader_parameter/light_direction = Vector3(0, -1, 0)
