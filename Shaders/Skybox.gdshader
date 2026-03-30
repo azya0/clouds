@@ -107,7 +107,7 @@ float phase_function(float cos_teta, float g) {
 vec3 get_sphere_intersection(vec3 position, vec3 direction) {
 	float _dot = dot(position, direction);
 	
-	float _sqrt = sqrt(pow(_dot, 2.0) + 1.0 - pow(length(position), 2.0));
+	float _sqrt = sqrt(_dot * _dot + 1.0 - length(position) * length(position));
 	
 	return position + direction * (-_dot + _sqrt);
 }
@@ -127,6 +127,7 @@ float cast_ray_to_sun(vec3 position, float current_time) {
 	float full_density = 0.0;
 
 	for (int index = 0; index < sun_steps; index++) {
+		// Важно переводить в локальные координаты!
 		vec3 local_position = to_01(position);
 		
 		full_density += get_density(local_position, current_time);
@@ -152,7 +153,7 @@ vec4 raymarching(vec3 direction) {
 	float phase1 = phase_impact_1 * phase_function(cos_teta, phase_const_1);
 	float phase2 = phase_impact_2 * phase_function(cos_teta, phase_const_2);
 	
-	float current_time = TIME;
+	float current_time = 0.0;
 
 	for (int index = 0; index < steps; index++) {
 		vec3 local_position = to_01(position);

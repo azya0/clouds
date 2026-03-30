@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://c6rnu640ccki5"]
+
+[ext_resource type="Shader" uid="uid://kxo5txsekwmn" path="res://Shaders/Skybox.gdshader" id="1_21qnn"]
+[ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="2_anra8"]
+[ext_resource type="ImageTexture3D" uid="uid://b1v8adpxxovhr" path="res://Dataset/LargeImage.tres" id="3_vxc0a"]
+[ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="4_3ikmy"]
+[ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="5_f55n0"]
+[ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="6_jvre3"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3lrhi"]
+shader = ExtResource("1_21qnn")
+shader_parameter/perlin_noise = ExtResource("5_f55n0")
+shader_parameter/large_cloud_noise = ExtResource("3_vxc0a")
+shader_parameter/medium_cloud_noise = ExtResource("4_3ikmy")
+shader_parameter/small_cloud_noise = ExtResource("6_jvre3")
+shader_parameter/curl_noise = ExtResource("2_anra8")
+shader_parameter/steps = 64
+shader_parameter/light_direction = Vector3(-1, 0.2, 0)
+shader_parameter/density_constant = 1.0
+shader_parameter/sun_constant = 200.0
+shader_parameter/sunlight_color = Vector3(6, 6, 6)
+shader_parameter/phase_impact_1 = 1.0
+shader_parameter/phase_impact_2 = 1.0
+shader_parameter/phase_const_1 = 0.9
+shader_parameter/phase_const_2 = 0.4
+shader_parameter/fluffiness_coefficient = 1.0
+shader_parameter/large_cloud_form_const = 1.5150000000000001
+shader_parameter/medium_cloud_form_const = 1.375
+shader_parameter/small_cloud_form_const = 1.5
+shader_parameter/weather_map_constans = 0.028
+shader_parameter/curl_steps = 0
+shader_parameter/curl_intensivity = 0.015
+shader_parameter/edges_wind_power = 0.002
+shader_parameter/wind_direction = Vector3(0, 1, 0)
+shader_parameter/sun_steps = 0
+shader_parameter/percentage_troposphere = 0.25
+
+[sub_resource type="Sky" id="Sky_2mb0d"]
+sky_material = SubResource("ShaderMaterial_3lrhi")
+
+[sub_resource type="Environment" id="Environment_blj2i"]
+background_mode = 2
+background_energy_multiplier = 16.0
+sky = SubResource("Sky_2mb0d")
+
+[node name="BaseScene" type="Node3D" unique_id=2127741809]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=230162253]
+environment = SubResource("Environment_blj2i")
