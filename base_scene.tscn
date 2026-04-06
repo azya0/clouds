@@ -6,6 +6,8 @@
 [ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="4_3ikmy"]
 [ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="5_f55n0"]
 [ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="6_jvre3"]
+[ext_resource type="Script" uid="uid://bna6xuciwvqk4" path="res://Scripts/FPSLabel.gd" id="7_anra8"]
+[ext_resource type="Script" uid="uid://bdva3jq0jjim5" path="res://Scripts/rotating.gd" id="7_vxc0a"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3lrhi"]
 shader = ExtResource("1_21qnn")
@@ -24,7 +26,7 @@ shader_parameter/phase_impact_2 = 1.0
 shader_parameter/phase_const_1 = 0.9
 shader_parameter/phase_const_2 = 0.4
 shader_parameter/fluffiness_coefficient = 1.0
-shader_parameter/large_cloud_form_const = 1.5150000000000001
+shader_parameter/large_cloud_form_const = 1.515
 shader_parameter/medium_cloud_form_const = 1.375
 shader_parameter/small_cloud_form_const = 1.5
 shader_parameter/weather_map_constans = 0.028
@@ -32,7 +34,7 @@ shader_parameter/curl_steps = 0
 shader_parameter/curl_intensivity = 0.015
 shader_parameter/edges_wind_power = 0.002
 shader_parameter/wind_direction = Vector3(0, 1, 0)
-shader_parameter/sun_steps = 0
+shader_parameter/sun_steps = 32
 shader_parameter/percentage_troposphere = 0.25
 
 [sub_resource type="Sky" id="Sky_2mb0d"]
@@ -47,3 +49,12 @@ sky = SubResource("Sky_2mb0d")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=230162253]
 environment = SubResource("Environment_blj2i")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=671890578]
+transform = Transform3D(1, 0, 0, 0, 0.81915206, -0.57357645, 0, 0.57357645, 0.81915206, 0, 0, 0)
+script = ExtResource("7_vxc0a")
+
+[node name="FPSLabel" type="Label" parent="." unique_id=233320954]
+offset_right = 779.0
+offset_bottom = 140.0
+script = ExtResource("7_anra8")

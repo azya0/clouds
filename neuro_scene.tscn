@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://b1584h54rsh1h"]
 
 [ext_resource type="Script" uid="uid://dsndeukfdgape" path="res://Scripts/paste_shader.gd" id="1_m1aov"]
+[ext_resource type="Script" uid="uid://bdva3jq0jjim5" path="res://Scripts/rotating.gd" id="2_72b4e"]
 [ext_resource type="Shader" uid="uid://dpp3sp5lqbn60" path="res://Shaders/SkyboxNeuro.gdshader" id="2_idxhh"]
 [ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="3_72b4e"]
 [ext_resource type="ImageTexture3D" uid="uid://b1v8adpxxovhr" path="res://Dataset/LargeImage.tres" id="4_rybat"]
 [ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="5_lq8gi"]
 [ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="6_po1ln"]
 [ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="7_cbb8o"]
+[ext_resource type="Script" uid="uid://bna6xuciwvqk4" path="res://Scripts/FPSLabel.gd" id="9_72b4e"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jsk3o"]
 shader = ExtResource("2_idxhh")
@@ -18,7 +20,7 @@ shader_parameter/curl_noise = ExtResource("3_72b4e")
 shader_parameter/steps = 64
 shader_parameter/light_direction = Vector3(-1, 0.2, 0)
 shader_parameter/density_constant = 1.0
-shader_parameter/sun_constant = -100.0
+shader_parameter/sun_constant = -50.0
 shader_parameter/sunlight_color = Vector3(6, 6, 6)
 shader_parameter/phase_impact_1 = 1.0
 shader_parameter/phase_impact_2 = 1.0
@@ -49,7 +51,13 @@ script = ExtResource("1_m1aov")
 worldEnviroment = NodePath("WorldEnvironment")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=986445967]
-transform = Transform3D(0.999159, 0, -0.041003738, 0.014024103, 0.9396926, 0.34173247, 0.03853091, -0.34202012, 0.9389023, 1, 31.4, 53.9)
+transform = Transform3D(1, 0, 0, 0, 0.8191522, -0.57357645, 0, 0.5735765, 0.81915206, 0, 0, 0)
+script = ExtResource("2_72b4e")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=14208551]
 environment = SubResource("Environment_6iypd")
+
+[node name="FPSLabel" type="Label" parent="." unique_id=1122523002]
+offset_right = 779.0
+offset_bottom = 140.0
+script = ExtResource("9_72b4e")

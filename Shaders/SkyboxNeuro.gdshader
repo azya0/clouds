@@ -272,13 +272,14 @@ float[64] shared_0_layer(float[6] base_vector) {
 	
 	for (int row_index = 0; row_index < 64; row_index++) {
 		for (int index = 0; index < 6; index++) {
-			int marix_index = row_index * 64 + index;
-			result_vector[index] += base_vector[index] * shader_0[marix_index];
+			int matrix_index = row_index * 64 + index;
+			result_vector[index] += base_vector[index] * shader_0[matrix_index];
 		}
 		
 		result_vector[row_index] += shared_0_biases[row_index];
 	}
 	
+	// RELU
 	for (int index = 0; index < 64; index++) {
 		result_vector[index] = max(0.0, result_vector[index]);
 	}
@@ -296,8 +297,8 @@ float[32] shared_3_layer(float[64] base_vector) {
 	
 	for (int row_index = 0; row_index < 32; row_index++) {
 		for (int index = 0; index < 64; index++) {
-			int marix_index = row_index * 32 + index;
-			result_vector[index] += base_vector[index] * shared_3[marix_index];
+			int matrix_index = row_index * 32 + index;
+			result_vector[index] += base_vector[index] * shared_3[matrix_index];
 		}
 		
 		result_vector[row_index] += shared_3_biases[row_index];
@@ -319,8 +320,8 @@ float[32] regressor_0_layer(float[32] base_vector) {
 	
 	for (int row_index = 0; row_index < 32; row_index++) {
 		for (int index = 0; index < 32; index++) {
-			int marix_index = row_index * 32 + index;
-			result_vector[index] += base_vector[index] * regressor_0[marix_index];
+			int matrix_index = row_index * 32 + index;
+			result_vector[index] += base_vector[index] * regressor_0[matrix_index];
 		}
 		
 		result_vector[row_index] += regressor_0_biases[row_index];
@@ -350,7 +351,11 @@ float cast_ray_to_sun(vec3 position, float current_time) {
 	vec3 direction = -normalize(light_direction);
 	vec3 end_point = get_sphere_intersection(position, direction);
 	
-	float[6] input = { position.x, position.y, position.z, end_point.x, end_point.y, end_point.z };
+	float[6] input = { 
+		position.x, position.y, position.z,
+		end_point.x, end_point.y, end_point.z
+	};
+	
 	float[64] first_layer = shared_0_layer(input);
 	float[32] second_layer = shared_3_layer(first_layer);
 	float[32] third_layer = regressor_0_layer(second_layer);
