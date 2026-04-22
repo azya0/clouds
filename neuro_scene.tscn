@@ -3,24 +3,24 @@
 [ext_resource type="Script" uid="uid://dsndeukfdgape" path="res://Scripts/paste_shader.gd" id="1_m1aov"]
 [ext_resource type="Script" uid="uid://bdva3jq0jjim5" path="res://Scripts/rotating.gd" id="2_72b4e"]
 [ext_resource type="Shader" uid="uid://dpp3sp5lqbn60" path="res://Shaders/SkyboxNeuro.gdshader" id="2_idxhh"]
-[ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="3_72b4e"]
-[ext_resource type="ImageTexture3D" uid="uid://b1v8adpxxovhr" path="res://Dataset/LargeImage.tres" id="4_rybat"]
-[ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="5_lq8gi"]
-[ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="6_po1ln"]
-[ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="7_cbb8o"]
+[ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="4_72b4e"]
+[ext_resource type="ImageTexture3D" uid="uid://b1v8adpxxovhr" path="res://Dataset/LargeImage.tres" id="5_rybat"]
+[ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="6_lq8gi"]
+[ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="7_po1ln"]
+[ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="8_cbb8o"]
 [ext_resource type="Script" uid="uid://bna6xuciwvqk4" path="res://Scripts/FPSLabel.gd" id="9_72b4e"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jsk3o"]
 shader = ExtResource("2_idxhh")
-shader_parameter/perlin_noise = ExtResource("6_po1ln")
-shader_parameter/large_cloud_noise = ExtResource("4_rybat")
-shader_parameter/medium_cloud_noise = ExtResource("5_lq8gi")
-shader_parameter/small_cloud_noise = ExtResource("7_cbb8o")
-shader_parameter/curl_noise = ExtResource("3_72b4e")
-shader_parameter/steps = 64
-shader_parameter/light_direction = Vector3(-1, 0.2, 0)
+shader_parameter/perlin_noise = ExtResource("7_po1ln")
+shader_parameter/large_cloud_noise = ExtResource("5_rybat")
+shader_parameter/medium_cloud_noise = ExtResource("6_lq8gi")
+shader_parameter/small_cloud_noise = ExtResource("8_cbb8o")
+shader_parameter/curl_noise = ExtResource("4_72b4e")
+shader_parameter/steps = 128
+shader_parameter/light_direction = Vector3(-1, 0.2, 1)
 shader_parameter/density_constant = 1.0
-shader_parameter/sun_constant = -50.0
+shader_parameter/sun_constant = 20.0
 shader_parameter/sunlight_color = Vector3(6, 6, 6)
 shader_parameter/phase_impact_1 = 1.0
 shader_parameter/phase_impact_2 = 1.0
@@ -32,7 +32,7 @@ shader_parameter/medium_cloud_form_const = 1.375
 shader_parameter/small_cloud_form_const = 1.5
 shader_parameter/weather_map_constans = 0.028
 shader_parameter/curl_steps = 0
-shader_parameter/curl_intensivity = 0.015
+shader_parameter/curl_intensivity = 0.02
 shader_parameter/edges_wind_power = 0.002
 shader_parameter/wind_direction = Vector3(1, 0, 0)
 shader_parameter/percentage_troposphere = 0.25
