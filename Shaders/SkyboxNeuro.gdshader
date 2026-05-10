@@ -230,7 +230,7 @@ float classifier_layer(float[6] base_vector) {
 	
 	for (int row_index = 0; row_index < 64; row_index++) {
 		for (int index = 0; index < 6; index++) {
-			int matrix_index = row_index * 64 + index;
+			int matrix_index = row_index * 6 + index;
 			first_layer_vector[row_index] += base_vector[index] * shared_classifier_0[matrix_index];
 		}
 		
@@ -250,7 +250,7 @@ float classifier_layer(float[6] base_vector) {
 	
 	for (int row_index = 0; row_index < 32; row_index++) {
 		for (int index = 0; index < 64; index++) {
-			int matrix_index = row_index * 32 + index;
+			int matrix_index = row_index * 64 + index;
 			second_layer_vector[row_index] += first_layer_vector[index] * shared_classifier_3[matrix_index];
 		}
 		
@@ -427,7 +427,7 @@ float regressor_layer(float[6] base_vector) {
 	
 	for (int row_index = 0; row_index < 64; row_index++) {
 		for (int index = 0; index < 6; index++) {
-			int matrix_index = row_index * 64 + index;
+			int matrix_index = row_index * 6 + index;
 			first_layer_vector[row_index] += base_vector[index] * shared_regressor_0[matrix_index];
 		}
 		
@@ -447,7 +447,7 @@ float regressor_layer(float[6] base_vector) {
 	
 	for (int row_index = 0; row_index < 32; row_index++) {
 		for (int index = 0; index < 64; index++) {
-			int matrix_index = row_index * 32 + index;
+			int matrix_index = row_index * 64 + index;
 			second_layer_vector[row_index] += first_layer_vector[index] * shared_regressor_3[matrix_index];
 		}
 		
@@ -499,7 +499,9 @@ float cast_ray_to_sun(vec3 position, float current_time) {
 		end_point.x, end_point.y, end_point.z
 	};
 	
-	return regressor_layer(input);
+	float regressor_impact = regressor_layer(input);
+	
+	return regressor_impact;
 }
 
 uniform float percentage_troposphere = 0.25;

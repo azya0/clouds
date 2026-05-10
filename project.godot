@@ -22,3 +22,7 @@ config/icon="res://icon.svg"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/gpu_noise_texture/plugin.cfg")
+
+[rendering]
+
+limits/global_shader_variables/buffer_size=500000
