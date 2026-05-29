@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://1jodlhyecr7g"]
+
+[ext_resource type="Shader" uid="uid://kxo5txsekwmn" path="res://Shaders/Skybox.gdshader" id="1_kxov6"]
+[ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="2_s0ui7"]
+[ext_resource type="ImageTexture3D" uid="uid://b1v8adpxxovhr" path="res://Dataset/LargeImage.tres" id="3_10mr0"]
+[ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="4_ks6ja"]
+[ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="5_o1yr5"]
+[ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="6_sgdvn"]
+[ext_resource type="Script" uid="uid://bna6xuciwvqk4" path="res://Scripts/FPSLabel.gd" id="7_5fl4a"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jcgtt"]
+shader = ExtResource("1_kxov6")
+shader_parameter/perlin_noise = ExtResource("5_o1yr5")
+shader_parameter/large_cloud_noise = ExtResource("3_10mr0")
+shader_parameter/medium_cloud_noise = ExtResource("4_ks6ja")
+shader_parameter/small_cloud_noise = ExtResource("6_sgdvn")
+shader_parameter/curl_noise = ExtResource("2_s0ui7")
+shader_parameter/steps = 64
+shader_parameter/light_direction = Vector3(1, -0.85, 1)
+shader_parameter/density_constant = 1.0
+shader_parameter/sun_constant = 200.0
+shader_parameter/sunlight_color = Vector3(6, 6, 6)
+shader_parameter/phase_impact_1 = 22.955
+shader_parameter/phase_impact_2 = 22.755
+shader_parameter/phase_const_1 = 0.9
+shader_parameter/phase_const_2 = 0.4
+shader_parameter/fluffiness_coefficient = 1.0
+shader_parameter/large_cloud_form_const = 1.515
+shader_parameter/medium_cloud_form_const = 1.375
+shader_parameter/small_cloud_form_const = 1.5
+shader_parameter/weather_map_constans = 0.028
+shader_parameter/curl_steps = 0
+shader_parameter/curl_intensivity = 0.015
+shader_parameter/edges_wind_power = 0.002
+shader_parameter/wind_direction = Vector3(1, 0, 0)
+shader_parameter/sun_steps = 32
+shader_parameter/percentage_troposphere = 0.25
+shader_parameter/sky_top_color = Color(0.31396627, 0.45500875, 0.6478138, 1)
+shader_parameter/sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_sky_curve = 6.4000002565
+shader_parameter/ground_bottom_color = Color(0.2, 0.169, 0.133, 1)
+shader_parameter/ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_ground_curve = 100.0
+shader_parameter/sun_angle_max = 0.942
+shader_parameter/inv_sun_curve = 27.58000126255
+shader_parameter/exposure = 0.7950000377625
+shader_parameter/sky_cover_modulate = Color(1, 1, 1, 1)
+
+[sub_resource type="Sky" id="Sky_72b4e"]
+sky_material = SubResource("ShaderMaterial_jcgtt")
+
+[sub_resource type="Environment" id="Environment_63u5f"]
+background_mode = 2
+background_energy_multiplier = 16.0
+background_canvas_max_layer = 1
+sky = SubResource("Sky_72b4e")
+
+[node name="Simmulation" type="Node3D" unique_id=276895789]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1054167561]
+environment = SubResource("Environment_63u5f")
+
+[node name="FPSLabel" type="Label" parent="." unique_id=1941033927]
+offset_right = 779.0
+offset_bottom = 140.0
+script = ExtResource("7_5fl4a")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=915729662]
+transform = Transform3D(-0.6819983, 0.6020038, -0.41529462, 0, 0.56784374, 0.8231363, 0.7313537, 0.5613776, -0.38726848, 0, 0, 0)

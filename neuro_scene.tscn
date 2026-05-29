@@ -18,12 +18,12 @@ shader_parameter/medium_cloud_noise = ExtResource("6_lq8gi")
 shader_parameter/small_cloud_noise = ExtResource("8_cbb8o")
 shader_parameter/curl_noise = ExtResource("4_72b4e")
 shader_parameter/steps = 128
-shader_parameter/light_direction = Vector3(0.5, -1, 0.5)
+shader_parameter/light_direction = Vector3(1, -0.85, 1)
 shader_parameter/density_constant = 1.0
 shader_parameter/sun_constant = 200.0
 shader_parameter/sunlight_color = Vector3(6, 6, 6)
-shader_parameter/phase_impact_1 = 1.0
-shader_parameter/phase_impact_2 = 1.0
+shader_parameter/phase_impact_1 = 22.955
+shader_parameter/phase_impact_2 = 22.755
 shader_parameter/phase_const_1 = 0.9
 shader_parameter/phase_const_2 = 0.4
 shader_parameter/fluffiness_coefficient = 1.0
@@ -36,15 +36,25 @@ shader_parameter/curl_intensivity = 0.015
 shader_parameter/edges_wind_power = 0.002
 shader_parameter/wind_direction = Vector3(1, 0, 0)
 shader_parameter/percentage_troposphere = 0.25
+shader_parameter/sky_top_color = Color(0.31396627, 0.45500875, 0.6478138, 1)
+shader_parameter/sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_sky_curve = 6.4000002565
+shader_parameter/ground_bottom_color = Color(0.2, 0.169, 0.133, 1)
+shader_parameter/ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_ground_curve = 100.0
+shader_parameter/sun_angle_max = 0.942
+shader_parameter/inv_sun_curve = 27.58000126255
+shader_parameter/exposure = 0.7950000377625
+shader_parameter/sky_cover_modulate = Color(1, 1, 1, 1)
 
-[sub_resource type="Sky" id="Sky_4arys"]
+[sub_resource type="Sky" id="Sky_72b4e"]
 sky_material = SubResource("ShaderMaterial_jsk3o")
 
 [sub_resource type="Environment" id="Environment_6iypd"]
 background_mode = 2
 background_energy_multiplier = 16.0
 background_canvas_max_layer = 1
-sky = SubResource("Sky_4arys")
+sky = SubResource("Sky_72b4e")
 
 [node name="Node3D" type="Node3D" unique_id=1865247694 node_paths=PackedStringArray("worldEnviroment")]
 script = ExtResource("1_m1aov")
@@ -61,3 +71,6 @@ environment = SubResource("Environment_6iypd")
 offset_right = 779.0
 offset_bottom = 140.0
 script = ExtResource("9_72b4e")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=513605014]
+transform = Transform3D(-0.6819983, 0.6020038, -0.41529462, 0, 0.56784374, 0.8231363, 0.7313537, 0.5613776, -0.38726848, 0, 0, 0)

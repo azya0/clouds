@@ -2,6 +2,57 @@
 
 [ext_resource type="Script" uid="uid://r41yjaee0vu2" path="res://Scripts/static_texture.gd" id="1_8uh7m"]
 [ext_resource type="Texture3DRD" uid="uid://cnsch3yqn4g01" path="res://NoiseTextures/curl_noise.tres" id="2_8uh7m"]
+[ext_resource type="Shader" uid="uid://dpp3sp5lqbn60" path="res://Shaders/SkyboxNeuro.gdshader" id="3_vbegm"]
+[ext_resource type="ImageTexture3D" uid="uid://b1v8adpxxovhr" path="res://Dataset/LargeImage.tres" id="4_ehkex"]
+[ext_resource type="ImageTexture3D" uid="uid://bfx02o6iyqmv7" path="res://Dataset/MediumImage.tres" id="5_xersf"]
+[ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="6_00tp4"]
+[ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="7_77dp3"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5tkv4"]
+shader = ExtResource("3_vbegm")
+shader_parameter/perlin_noise = ExtResource("6_00tp4")
+shader_parameter/large_cloud_noise = ExtResource("4_ehkex")
+shader_parameter/medium_cloud_noise = ExtResource("5_xersf")
+shader_parameter/small_cloud_noise = ExtResource("7_77dp3")
+shader_parameter/curl_noise = ExtResource("2_8uh7m")
+shader_parameter/steps = 128
+shader_parameter/light_direction = Vector3(1, -0.85, 1)
+shader_parameter/density_constant = 1.0
+shader_parameter/sun_constant = 0.0
+shader_parameter/sunlight_color = Vector3(6, 6, 6)
+shader_parameter/phase_impact_1 = 22.955
+shader_parameter/phase_impact_2 = 22.755
+shader_parameter/phase_const_1 = 0.9
+shader_parameter/phase_const_2 = 0.4
+shader_parameter/fluffiness_coefficient = 1.0
+shader_parameter/large_cloud_form_const = 1.515
+shader_parameter/medium_cloud_form_const = 1.375
+shader_parameter/small_cloud_form_const = 1.5
+shader_parameter/weather_map_constans = 0.028
+shader_parameter/curl_steps = 0
+shader_parameter/curl_intensivity = 0.015
+shader_parameter/edges_wind_power = 0.002
+shader_parameter/wind_direction = Vector3(1, 0, 0)
+shader_parameter/percentage_troposphere = 0.25
+shader_parameter/sky_top_color = Color(0.31396627, 0.45500875, 0.6478138, 1)
+shader_parameter/sky_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_sky_curve = 6.4000002565
+shader_parameter/ground_bottom_color = Color(0.2, 0.169, 0.133, 1)
+shader_parameter/ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
+shader_parameter/inv_ground_curve = 100.0
+shader_parameter/sun_angle_max = 0.942
+shader_parameter/inv_sun_curve = 27.58000126255
+shader_parameter/exposure = 0.7950000377625
+shader_parameter/sky_cover_modulate = Color(1, 1, 1, 1)
+
+[sub_resource type="Sky" id="Sky_4arys"]
+sky_material = SubResource("ShaderMaterial_5tkv4")
+
+[sub_resource type="Environment" id="Environment_0m0f1"]
+background_mode = 2
+background_energy_multiplier = 16.0
+background_canvas_max_layer = 1
+sky = SubResource("Sky_4arys")
 
 [node name="Test" type="Node3D" unique_id=684819331]
 
@@ -9,3 +60,6 @@
 script = ExtResource("1_8uh7m")
 source_noise_texture = ExtResource("2_8uh7m")
 output_path = "res://Dataset/CurlImage.tres"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=2092337302]
+environment = SubResource("Environment_0m0f1")
