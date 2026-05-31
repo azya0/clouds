@@ -7,6 +7,7 @@
 [ext_resource type="ImageTexture3D" uid="uid://dxjhs8usbri8k" path="res://Dataset/PerlinImage.tres" id="5_o1yr5"]
 [ext_resource type="ImageTexture3D" uid="uid://cx5mkwuxrgw4g" path="res://Dataset/SmallImage.tres" id="6_sgdvn"]
 [ext_resource type="Script" uid="uid://bna6xuciwvqk4" path="res://Scripts/FPSLabel.gd" id="7_5fl4a"]
+[ext_resource type="Script" uid="uid://dxjrpwhdledfr" path="res://Scripts/TimelapseController.gd" id="8_fa3gl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jcgtt"]
 shader = ExtResource("1_kxov6")
@@ -15,52 +16,68 @@ shader_parameter/large_cloud_noise = ExtResource("3_10mr0")
 shader_parameter/medium_cloud_noise = ExtResource("4_ks6ja")
 shader_parameter/small_cloud_noise = ExtResource("6_sgdvn")
 shader_parameter/curl_noise = ExtResource("2_s0ui7")
-shader_parameter/steps = 64
-shader_parameter/light_direction = Vector3(-0.255, -0.95, 1)
-shader_parameter/density_constant = 1.0
-shader_parameter/sun_constant = 75.0
-shader_parameter/sunlight_color = Vector3(6, 6, 6)
-shader_parameter/phase_impact_1 = 22.955
-shader_parameter/phase_impact_2 = 22.755
+shader_parameter/steps = 32
+shader_parameter/light_direction = Vector3(0.48, -0.95, 1)
+shader_parameter/density_constant = 10.0
+shader_parameter/sun_constant = 100.0
+shader_parameter/sunlight_color = Vector3(2.5, 2.5, 2.5)
+shader_parameter/phase_impact_1 = 0.0
+shader_parameter/phase_impact_2 = 10.000000475
 shader_parameter/phase_const_1 = 0.9
-shader_parameter/phase_const_2 = 0.4
+shader_parameter/phase_const_2 = 0.4810000228475
 shader_parameter/fluffiness_coefficient = 1.0
 shader_parameter/large_cloud_form_const = 1.515
 shader_parameter/medium_cloud_form_const = 1.375
 shader_parameter/small_cloud_form_const = 1.5
 shader_parameter/weather_map_constans = 0.028
-shader_parameter/curl_steps = 1
-shader_parameter/curl_intensivity = 0.015
-shader_parameter/edges_wind_power = 0.002
-shader_parameter/wind_direction = Vector3(1, 0, 3.14)
-shader_parameter/sun_steps = 32
+shader_parameter/curl_steps = 2
+shader_parameter/curl_intensivity = 0.012
+shader_parameter/edges_wind_power = 0.001
+shader_parameter/wind_direction = Vector3(1, 0, 0)
+shader_parameter/sun_steps = 16
 shader_parameter/percentage_troposphere = 0.25
 shader_parameter/ground_bottom_color = Color(0.22705701, 0.45139122, 0.65872157, 1)
 shader_parameter/ground_horizon_color = Color(0.646, 0.656, 0.67, 1)
 shader_parameter/inv_ground_curve = 100.0
-shader_parameter/exposure = 0.0670000031825
-shader_parameter/atmosphere_exposure = 0.2000000095
-shader_parameter/atmosphere_intensity = 24.0210011409975
-shader_parameter/rayleigh_strength = 0.835
-shader_parameter/mie_strength = 0.800000038
+shader_parameter/exposure = 0.074000003515
+shader_parameter/atmosphere_exposure = 0.622000029545
+shader_parameter/atmosphere_intensity = 16.0
+shader_parameter/rayleigh_strength = 2.000000095
+shader_parameter/mie_strength = 0.28800001368
 shader_parameter/mie_extinction_multiplier = 0.7
-shader_parameter/mie_g = 0.7
+shader_parameter/mie_g = 0.9900000095367401
+shader_parameter/mie_halo_strength = 0.67600003211
+shader_parameter/sun_disc_size_degrees = 2.0270000946525597
+shader_parameter/sun_disc_softness_degrees = 0.510000024225
+shader_parameter/sun_disc_intensity = 0.0
 
 [sub_resource type="Sky" id="Sky_72b4e"]
 sky_material = SubResource("ShaderMaterial_jcgtt")
 
 [sub_resource type="Environment" id="Environment_63u5f"]
 background_mode = 2
-background_energy_multiplier = 16.0
+background_energy_multiplier = 13.35
 background_canvas_max_layer = 1
 sky = SubResource("Sky_72b4e")
 
-[node name="Simmulation" type="Node3D" unique_id=276895789]
+[node name="Simmulation" type="Node3D" unique_id=276895789 node_paths=PackedStringArray("world_environment", "camera")]
+script = ExtResource("8_fa3gl")
+loop = false
+duration_seconds = 48.0
+quit_when_finished = true
+world_environment = NodePath("WorldEnvironment")
+camera = NodePath("Camera3D")
+view_pitch_degrees = 36.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1054167561]
 environment = SubResource("Environment_63u5f")
 
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1869157019]
+transform = Transform3D(1, 0, 0, 0, 0.573576, 0.819152, 0, -0.819152, 0.573576, 0, 0, 0)
+current = true
+
 [node name="FPSLabel" type="Label" parent="." unique_id=1941033927]
+visible = false
 offset_right = 779.0
 offset_bottom = 140.0
 script = ExtResource("7_5fl4a")

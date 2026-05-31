@@ -13,10 +13,10 @@ uniform float density_constant	= 1.0;
 uniform float sun_constant		= 1.0;
 uniform vec3 sunlight_color		= vec3(1.0);
 
-uniform float phase_impact_1	= 1.0;
-uniform float phase_impact_2	= 1.0;
-uniform float phase_const_1		= 0.0;
-uniform float phase_const_2		= 0.0;
+uniform float phase_impact_1: hint_range(0.0, 50.0)	= 1.0;
+uniform float phase_impact_2: hint_range(0.0, 50.0)	= 1.0;
+uniform float phase_const_1: hint_range(0.0, 1.0)	= 0.0;
+uniform float phase_const_2: hint_range(0.0, 1.0)	= 0.0;
 
 uniform float fluffiness_coefficient = 1.0;
 
@@ -195,13 +195,16 @@ const float MIE_SCALE_HEIGHT = 1200.0;
 const vec3 BASE_RAYLEIGH_BETA = vec3(5.8e-6, 13.5e-6, 33.1e-6);
 const vec3 BASE_MIE_BETA = vec3(2.0e-5);
 
-uniform float atmosphere_exposure : hint_range(0.0, 64.0) = 0.39;
+uniform float atmosphere_exposure : hint_range(0.0, 1.0) = 0.39;
 uniform float atmosphere_intensity : hint_range(0.0, 64.0) = 20.3;
 uniform float rayleigh_strength : hint_range(0.0, 8.0) = 0.835;
 uniform float mie_strength : hint_range(0.0, 8.0) = 0.8;
 uniform float mie_extinction_multiplier : hint_range(0.0, 8.0) = 0.7;
 uniform float mie_g : hint_range(0.0, 0.99) = 0.7;
-
+uniform float mie_halo_strength : hint_range(0.0, 2.0) = 0.35;
+uniform float sun_disc_size_degrees : hint_range(0.05, 5.0) = 0.53;
+uniform float sun_disc_softness_degrees : hint_range(0.0, 2.0) = 0.08;
+uniform float sun_disc_intensity : hint_range(0.0, 16.0) = 1.2;
 
 vec2 sphere_intersections(vec3 ray_origin, vec3 ray_direction, float radius) {
 	float b = dot(ray_origin, ray_direction);
@@ -224,6 +227,15 @@ float mie_phase(float cos_theta, float g) {
 	float g2 = g * g;
 	float denominator = pow(1.0 + g2 - 2.0 * g * cos_theta, 1.5);
 	return (3.0 / (8.0 * PI)) * ((1.0 - g2) * (1.0 + cos_theta * cos_theta)) / ((2.0 + g2) * denominator);
+}
+
+vec3 get_sun_disc(vec3 view_direction, vec3 sun_direction) {
+	float cos_angle = dot(view_direction, sun_direction);
+	float disc_inner = cos(radians(sun_disc_size_degrees));
+	float disc_outer = cos(radians(sun_disc_size_degrees + sun_disc_softness_degrees));
+	float disc = smoothstep(disc_outer, disc_inner, cos_angle);
+
+	return sunlight_color * sun_disc_intensity * disc;
 }
 
 vec2 atmosphere_density(vec3 position) {
@@ -303,7 +315,7 @@ vec3 get_atmosphere_color(vec3 view_direction, vec3 sun_direction) {
 	float cos_theta = dot(view_direction, sun_direction);
 	vec3 scattering = (
 		rayleigh_sum * rayleigh_beta * rayleigh_phase(cos_theta) +
-		mie_sum * mie_beta * mie_phase(cos_theta, mie_g)
+		mie_sum * mie_beta * mie_phase(cos_theta, mie_g) * mie_halo_strength
 	);
 
 	vec3 color = sunlight_color * scattering * atmosphere_intensity;
@@ -319,7 +331,9 @@ void sky() {
 
 	if (EYEDIR.y >= 0.0) {
 		vec3 direction = EYEDIR;
-		vec3 atmosphere = get_atmosphere_color(normalize(direction), sun_direction);
+		vec3 view_direction = normalize(direction);
+		vec3 atmosphere = get_atmosphere_color(view_direction, sun_direction);
+		atmosphere += get_sun_disc(view_direction, sun_direction);
 		vec3 sky_behind = atmosphere * exposure;
 
 		vec4 result = raymarching(direction);
